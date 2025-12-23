@@ -98,3 +98,6 @@ The plugin creates a custom table `wp_doregister_users` with the following struc
 - PHP 7.2 or higher
 - jQuery (included with WordPress)
 
+---
+
+Made By Chamika Shashipriya Under DoAcadamy Module 2 Assignment 2 of Full-Stack Web Developer Industrial Training Program
