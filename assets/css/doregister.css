@@ -1,514 +1,1444 @@
-/* DoRegister Plugin Styles */
+/**
+ * DoRegister Plugin Styles
+ * 
+ * This stylesheet provides comprehensive styling for the DoRegister WordPress plugin.
+ * It includes styles for registration forms, login forms, profile pages, and admin interfaces.
+ * 
+ * Design Principles:
+ * - Modern, clean aesthetic with subtle shadows and rounded corners
+ * - Consistent color scheme: Green (#4CAF50) for primary actions, red (#e74c3c) for errors
+ * - Responsive design with mobile-first considerations
+ * - Smooth transitions and animations for better UX
+ * - Clear visual hierarchy through typography and spacing
+ * 
+ * Color Palette:
+ * - Primary Green: #4CAF50 (success, primary actions)
+ * - Error Red: #e74c3c (errors, destructive actions)
+ * - Neutral Gray: #757575 (secondary actions)
+ * - Text Dark: #333, #2c3e50 (headings, body text)
+ * - Text Light: #666 (secondary text)
+ * - Background Light: #f9f9f9, #f8f9fa (subtle backgrounds)
+ */
 
+/* ==========================================================================
+   LAYOUT: Main Container Wrappers
+   ========================================================================== */
+
+/**
+ * Main Container Wrappers
+ * 
+ * Base container styles shared by registration, login, and profile wrappers.
+ * Creates a centered, card-like container with consistent spacing and shadow.
+ * 
+ * Design Intent:
+ * - max-width: 600px - Optimal reading width for forms (prevents eye strain)
+ * - margin: 40px auto - Vertical spacing and horizontal centering
+ * - padding: 30px - Internal spacing for content breathing room
+ * - border-radius: 8px - Modern rounded corners (softens appearance)
+ * - box-shadow - Subtle elevation effect (creates depth, separates from background)
+ * 
+ * Note: Profile wrapper overrides some of these values (see Profile section)
+ */
 .doregister-registration-wrapper,
 .doregister-login-wrapper,
 .doregister-profile-wrapper {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 30px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* Constrains width for optimal readability */
+    margin: 40px auto; /* Vertical spacing (40px) + horizontal centering (auto) */
+    padding: 30px; /* Internal padding for content spacing */
+    background: #fff; /* White background for contrast */
+    border-radius: 8px; /* Rounded corners for modern appearance */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
-/* Progress Bar */
+/* ==========================================================================
+   COMPONENTS: Progress Bar
+   ========================================================================== */
+
+/**
+ * Progress Bar Container
+ * 
+ * Visual indicator showing form completion progress (Step 1 of 5, etc.).
+ * Displays as a horizontal bar that fills as user progresses through steps.
+ * 
+ * Design Intent:
+ * - Thin height (6px) - Subtle, doesn't dominate the interface
+ * - Light gray background - Neutral, shows unfilled portion
+ * - overflow: hidden - Clips progress fill to rounded corners
+ * - margin-bottom: 20px - Spacing from step indicator below
+ */
 .doregister-progress-bar {
-    width: 100%;
-    height: 6px;
-    background: #e0e0e0;
-    border-radius: 3px;
-    margin-bottom: 20px;
-    overflow: hidden;
+    width: 100%; /* Full width of container */
+    height: 6px; /* Thin bar height (subtle visual indicator) */
+    background: #e0e0e0; /* Light gray background (unfilled portion) */
+    border-radius: 3px; /* Rounded corners matching container */
+    margin-bottom: 20px; /* Spacing below progress bar */
+    overflow: hidden; /* Clips child elements to rounded corners */
 }
 
+/**
+ * Progress Fill Bar
+ * 
+ * The animated portion that fills the progress bar as user advances.
+ * Width is controlled by JavaScript based on current step (20%, 40%, 60%, 80%, 100%).
+ * 
+ * Design Intent:
+ * - Green gradient - Matches primary action color (visual consistency)
+ * - Smooth transition - Width changes animate smoothly (0.3s ease)
+ * - height: 100% - Fills entire container height
+ * 
+ * Interaction:
+ * - JavaScript updates width property (e.g., width: 40% for step 2 of 5)
+ * - Transition property animates width changes smoothly
+ */
 .doregister-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #4CAF50, #45a049);
-    transition: width 0.3s ease;
+    height: 100%; /* Fills entire progress bar height */
+    background: linear-gradient(90deg, #4CAF50, #45a049); /* Green gradient (left to right) */
+    transition: width 0.3s ease; /* Smooth animation when width changes (via JavaScript) */
 }
 
-/* Step Indicator */
+/* ==========================================================================
+   COMPONENTS: Step Indicator
+   ========================================================================== */
+
+/**
+ * Step Indicator Container
+ * 
+ * Displays "Step X of 5" text to show current position in multi-step form.
+ * Provides context and helps users understand form length.
+ * 
+ * Design Intent:
+ * - Centered text - Balanced appearance
+ * - Smaller font (14px) - Secondary information (doesn't compete with headings)
+ * - Light gray color (#666) - Subtle, non-intrusive
+ * - margin-bottom: 30px - Spacing before form content
+ */
 .doregister-step-indicator {
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 14px;
-    color: #666;
+    text-align: center; /* Center-aligns step text */
+    margin-bottom: 30px; /* Spacing before form steps */
+    font-size: 14px; /* Smaller font (secondary information) */
+    color: #666; /* Light gray (subtle appearance) */
 }
 
+/**
+ * Current Step Number
+ * 
+ * Emphasizes the current step number within the indicator text.
+ * Makes the step number stand out while keeping overall indicator subtle.
+ * 
+ * Design Intent:
+ * - Bold weight (600) - Emphasizes current step
+ * - Darker color (#333) - Higher contrast, draws attention
+ * 
+ * Interaction:
+ * - JavaScript updates the step number text dynamically
+ */
 .doregister-current-step {
-    font-weight: 600;
-    color: #333;
+    font-weight: 600; /* Semi-bold for emphasis */
+    color: #333; /* Dark gray (higher contrast than container) */
 }
 
-/* Form Steps */
+/* ==========================================================================
+   COMPONENTS: Form Steps (Multi-Step Navigation)
+   ========================================================================== */
+
+/**
+ * Base Step State (Hidden)
+ * 
+ * Default state for all form steps. Steps are hidden by default and only
+ * shown when they become active. This prevents all steps from displaying at once.
+ * 
+ * Design Intent:
+ * - display: none - Completely removes from layout (not just hidden visually)
+ * - This is the base state - overridden by .doregister-step-active
+ */
 .doregister-step {
-    display: none;
+    display: none; /* Hidden by default (only one step visible at a time) */
 }
 
+/**
+ * Active Step State
+ * 
+ * Applied to the current step being displayed. Shows the step with a smooth
+ * fade-in animation for better UX.
+ * 
+ * Design Intent:
+ * - display: block - Makes step visible and part of document flow
+ * - fadeIn animation - Smooth entrance (0.3s) prevents jarring transitions
+ * 
+ * Interaction:
+ * - JavaScript adds/removes this class when navigating between steps
+ * - Animation plays each time step becomes active
+ */
 .doregister-step.doregister-step-active {
-    display: block;
-    animation: fadeIn 0.3s ease;
+    display: block; /* Makes step visible */
+    animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
 }
 
+/**
+ * Hidden Step State (Explicit)
+ * 
+ * Explicitly hides a step. Used when transitioning away from a step.
+ * Ensures step is hidden even if base class is overridden.
+ * 
+ * Note: This is redundant with base .doregister-step but provides explicit
+ * control during JavaScript-driven transitions.
+ */
 .doregister-step.doregister-step-hidden {
-    display: none;
+    display: none; /* Explicitly hidden (for transition states) */
 }
 
+/**
+ * Fade-In Animation
+ * 
+ * Keyframe animation for step transitions. Creates smooth entrance effect
+ * by combining opacity and vertical translation.
+ * 
+ * Animation Flow:
+ * - Starts: Invisible (opacity: 0) and slightly below (translateY(10px))
+ * - Ends: Fully visible (opacity: 1) and in position (translateY(0))
+ * 
+ * Design Intent:
+ * - Subtle movement (10px) - Draws attention without being distracting
+ * - Opacity transition - Smooth visibility change
+ * - 0.3s duration - Fast enough to feel responsive, slow enough to be smooth
+ */
 @keyframes fadeIn {
     from {
-        opacity: 0;
-        transform: translateY(10px);
+        opacity: 0; /* Starts invisible */
+        transform: translateY(10px); /* Starts 10px below final position */
     }
     to {
-        opacity: 1;
-        transform: translateY(0);
+        opacity: 1; /* Ends fully visible */
+        transform: translateY(0); /* Ends in final position */
     }
 }
 
+/**
+ * Step Heading
+ * 
+ * Styles the h2 heading within each step (e.g., "Basic Information").
+ * Creates clear visual hierarchy for step content.
+ * 
+ * Design Intent:
+ * - Large font (24px) - Clear hierarchy, easy to read
+ * - Bold weight (600) - Emphasizes step title
+ * - margin-top: 0 - Removes default margin (consistent spacing)
+ * - margin-bottom: 25px - Spacing before form fields
+ * - Dark color (#333) - High contrast for readability
+ */
 .doregister-step h2 {
-    margin-top: 0;
-    margin-bottom: 25px;
-    color: #333;
-    font-size: 24px;
-    font-weight: 600;
+    margin-top: 0; /* Removes default top margin */
+    margin-bottom: 25px; /* Spacing before form fields */
+    color: #333; /* Dark gray for readability */
+    font-size: 24px; /* Large font for hierarchy */
+    font-weight: 600; /* Semi-bold for emphasis */
 }
 
-/* Field Groups */
+/* ==========================================================================
+   COMPONENTS: Form Field Groups
+   ========================================================================== */
+
+/**
+ * Field Group Container
+ * 
+ * Wraps each form field (input + label + error message) for consistent spacing.
+ * Creates vertical rhythm and groups related elements together.
+ * 
+ * Design Intent:
+ * - margin-bottom: 20px - Consistent vertical spacing between fields
+ * - Acts as a layout container for label, input, and error message
+ */
 .doregister-field-group {
-    margin-bottom: 20px;
+    margin-bottom: 20px; /* Spacing between field groups */
 }
 
+/**
+ * Field Label
+ * 
+ * Styles labels for form inputs. Labels are block-level for proper spacing
+ * and accessibility.
+ * 
+ * Design Intent:
+ * - display: block - Full width, creates line break (label above input)
+ * - font-weight: 500 - Medium weight (readable but not too bold)
+ * - font-size: 14px - Standard readable size
+ * - margin-bottom: 8px - Small gap between label and input
+ * - Dark color (#333) - Good contrast for readability
+ */
 .doregister-field-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #333;
-    font-size: 14px;
+    display: block; /* Block-level (label appears above input) */
+    margin-bottom: 8px; /* Small spacing between label and input */
+    font-weight: 500; /* Medium weight (readable emphasis) */
+    color: #333; /* Dark gray for readability */
+    font-size: 14px; /* Standard readable font size */
 }
 
+/**
+ * Required Field Indicator
+ * 
+ * Styles the asterisk (*) that marks required fields.
+ * Uses error red color to draw attention to required status.
+ * 
+ * Design Intent:
+ * - Red color (#e74c3c) - Matches error color (visual consistency)
+ * - Draws attention to required fields
+ * - Typically used as: <span class="required">*</span>
+ */
 .doregister-field-group .required {
-    color: #e74c3c;
+    color: #e74c3c; /* Red color (matches error styling) */
 }
 
-/* Input Fields */
+/* ==========================================================================
+   COMPONENTS: Form Input Fields
+   ========================================================================== */
+
+/**
+ * Base Input Field Styles
+ * 
+ * Styles all text, email, password, tel, date, and select inputs.
+ * Creates consistent appearance and spacing across all input types.
+ * 
+ * Design Intent:
+ * - Full width (100%) - Utilizes available space, consistent appearance
+ * - Generous padding (12px 15px) - Comfortable click/tap target, readable text
+ * - 2px border - Visible but not heavy, provides clear boundaries
+ * - Rounded corners (5px) - Modern, soft appearance
+ * - box-sizing: border-box - Padding and border included in width (prevents overflow)
+ * - Smooth border transition - Visual feedback on focus/error states
+ * 
+ * Interaction:
+ * - :focus state changes border to green (see below)
+ * - .doregister-input-error class changes border to red (validation errors)
+ */
 .doregister-input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-    box-sizing: border-box;
+    width: 100%; /* Full width of container */
+    padding: 12px 15px; /* Internal spacing (vertical, horizontal) */
+    border: 2px solid #ddd; /* Light gray border (2px for visibility) */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable font size */
+    transition: border-color 0.3s ease; /* Smooth border color change */
+    box-sizing: border-box; /* Includes padding/border in width calculation */
 }
 
+/**
+ * Input Focus State
+ * 
+ * Styles input when user clicks/tabs into it (focused state).
+ * Provides visual feedback and indicates active field.
+ * 
+ * Design Intent:
+ * - Green border (#4CAF50) - Matches primary action color (brand consistency)
+ * - outline: none - Removes default browser outline (we use border instead)
+ * - Transition animates border color change smoothly
+ * 
+ * Accessibility:
+ * - Border color change provides clear focus indicator
+ * - High contrast green ensures visibility
+ */
 .doregister-input:focus {
-    outline: none;
-    border-color: #4CAF50;
+    outline: none; /* Removes default browser outline */
+    border-color: #4CAF50; /* Green border on focus (primary color) */
 }
 
+/**
+ * Input Error State
+ * 
+ * Applied by JavaScript when field validation fails.
+ * Provides immediate visual feedback for invalid input.
+ * 
+ * Design Intent:
+ * - Red border (#e74c3c) - Standard error color (universal recognition)
+ * - Combined with error message below for clear feedback
+ * 
+ * Interaction:
+ * - JavaScript adds this class when validation fails
+ * - Removed when field becomes valid
+ */
 .doregister-input.doregister-input-error {
-    border-color: #e74c3c;
+    border-color: #e74c3c; /* Red border for error state */
 }
 
+/**
+ * File Input Override
+ * 
+ * Special styling for file input fields. File inputs have different
+ * default browser styling, so padding is adjusted.
+ * 
+ * Design Intent:
+ * - Reduced padding (8px) - File inputs have built-in button, less padding needed
+ * - Maintains visual consistency with other inputs
+ */
 .doregister-file-input {
-    padding: 8px;
+    padding: 8px; /* Reduced padding for file inputs */
 }
 
-/* Error Messages */
+/* ==========================================================================
+   COMPONENTS: Error Messages
+   ========================================================================== */
+
+/**
+ * Error Message Container
+ * 
+ * Container for inline validation error messages. Hidden by default,
+ * shown when validation fails. Uses opacity transition for smooth appearance.
+ * 
+ * Design Intent:
+ * - display: block - Full width, appears below input
+ * - Red color (#e74c3c) - Standard error color (universal recognition)
+ * - Small font (12px) - Secondary information, doesn't dominate
+ * - min-height: 18px - Prevents layout shift when message appears/disappears
+ * - opacity: 0 (default) - Hidden but takes up space (prevents layout shift)
+ * - Smooth opacity transition - Fades in/out smoothly
+ * 
+ * Interaction:
+ * - JavaScript adds .doregister-error-visible class to show message
+ * - Opacity transition creates smooth fade-in effect
+ */
 .doregister-error-message {
-    display: block;
-    color: #e74c3c;
-    font-size: 12px;
-    margin-top: 5px;
-    min-height: 18px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    display: block; /* Block-level (full width, appears below input) */
+    color: #e74c3c; /* Red color (error indication) */
+    font-size: 12px; /* Smaller font (secondary information) */
+    margin-top: 5px; /* Small spacing from input above */
+    min-height: 18px; /* Prevents layout shift when message appears */
+    opacity: 0; /* Hidden by default (invisible but takes space) */
+    transition: opacity 0.3s ease; /* Smooth fade-in/out animation */
 }
 
+/**
+ * Visible Error Message State
+ * 
+ * Applied by JavaScript when error message should be displayed.
+ * Makes error message visible with smooth fade-in.
+ * 
+ * Interaction:
+ * - JavaScript toggles this class based on validation state
+ * - Opacity transition creates smooth appearance
+ */
 .doregister-error-message.doregister-error-visible {
-    opacity: 1;
+    opacity: 1; /* Fully visible when error occurs */
 }
 
-/* Radio and Checkbox Groups */
+/* ==========================================================================
+   COMPONENTS: Radio and Checkbox Groups
+   ========================================================================== */
+
+/**
+ * Radio/Checkbox Group Container
+ * 
+ * Flexbox container for radio buttons and checkboxes. Arranges options
+ * horizontally with wrapping for responsive layout.
+ * 
+ * Design Intent:
+ * - display: flex - Horizontal layout for options
+ * - flex-wrap: wrap - Wraps to new line on small screens
+ * - gap: 15px - Consistent spacing between options (modern CSS, no margins)
+ * - margin-top: 10px - Spacing from label above
+ * 
+ * Responsive:
+ * - Options wrap to multiple lines on smaller screens
+ * - Gap property provides consistent spacing regardless of wrapping
+ */
 .doregister-radio-group,
 .doregister-checkbox-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-top: 10px;
+    display: flex; /* Flexbox layout (horizontal arrangement) */
+    flex-wrap: wrap; /* Allows wrapping to new line */
+    gap: 15px; /* Spacing between options (modern CSS gap property) */
+    margin-top: 10px; /* Spacing from label above */
 }
 
+/**
+ * Radio/Checkbox Label
+ * 
+ * Styles labels for radio buttons and checkboxes. Labels wrap the input
+ * to create larger clickable area (better UX).
+ * 
+ * Design Intent:
+ * - display: flex - Aligns input and text horizontally
+ * - align-items: center - Vertically centers input with text
+ * - cursor: pointer - Indicates clickable area (entire label)
+ * - font-weight: normal - Regular weight (not bold)
+ * - margin-bottom: 0 - No bottom margin (gap property handles spacing)
+ * 
+ * UX Benefit:
+ * - Entire label is clickable (not just small checkbox/radio)
+ * - Improves accessibility and usability
+ */
 .doregister-radio-label,
 .doregister-checkbox-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-weight: normal;
-    margin-bottom: 0;
+    display: flex; /* Flexbox for horizontal alignment */
+    align-items: center; /* Vertically centers input with text */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    font-weight: normal; /* Regular weight (not bold) */
+    margin-bottom: 0; /* No bottom margin (gap handles spacing) */
 }
 
+/**
+ * Radio/Checkbox Input
+ * 
+ * Styles the actual input element within labels.
+ * Positions input before label text with spacing.
+ * 
+ * Design Intent:
+ * - margin-right: 8px - Spacing between input and label text
+ * - cursor: pointer - Pointer cursor for better UX
+ */
 .doregister-radio-label input,
 .doregister-checkbox-label input {
-    margin-right: 8px;
-    cursor: pointer;
+    margin-right: 8px; /* Spacing between input and text */
+    cursor: pointer; /* Pointer cursor for clickability */
 }
 
-/* Country Dropdown */
+/* ==========================================================================
+   COMPONENTS: Country Searchable Dropdown
+   ========================================================================== */
+
+/**
+ * Country Wrapper Container
+ * 
+ * Relative positioning container for the searchable country dropdown.
+ * Provides positioning context for absolutely positioned dropdown.
+ * 
+ * Design Intent:
+ * - position: relative - Creates positioning context for absolute child
+ * - Allows dropdown to be positioned relative to this container
+ */
 .doregister-country-wrapper {
-    position: relative;
+    position: relative; /* Positioning context for absolute dropdown */
 }
 
+/**
+ * Country Dropdown Menu
+ * 
+ * Absolutely positioned dropdown that appears below the search input.
+ * Displays filtered country list as user types. Hidden by default.
+ * 
+ * Design Intent:
+ * - position: absolute - Positioned relative to wrapper
+ * - top: 100% - Appears directly below input (no gap)
+ * - left: 0, right: 0 - Full width of wrapper
+ * - border-top: none - Seamless connection with input above
+ * - Rounded bottom corners only - Matches input's rounded top
+ * - max-height: 200px - Limits height, enables scrolling for long lists
+ * - overflow-y: auto - Vertical scrollbar when content exceeds max-height
+ * - z-index: 1000 - Appears above other content
+ * - display: none - Hidden by default (shown via JavaScript)
+ * 
+ * Interaction:
+ * - JavaScript shows/hides based on search input
+ * - Filters countries as user types
+ * - Scrolls when list exceeds max-height
+ */
 .doregister-country-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: #fff;
-    border: 2px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 5px 5px;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-    display: none;
+    position: absolute; /* Positioned relative to wrapper */
+    top: 100%; /* Appears directly below input */
+    left: 0; /* Aligned with left edge */
+    right: 0; /* Aligned with right edge (full width) */
+    background: #fff; /* White background */
+    border: 2px solid #ddd; /* Matches input border */
+    border-top: none; /* No top border (seamless with input) */
+    border-radius: 0 0 5px 5px; /* Rounded bottom corners only */
+    max-height: 200px; /* Maximum height before scrolling */
+    overflow-y: auto; /* Vertical scrollbar when needed */
+    z-index: 1000; /* Appears above other content */
+    display: none; /* Hidden by default (shown via JavaScript) */
 }
 
+/**
+ * Country List Container
+ * 
+ * Removes default list styling for the country dropdown list.
+ * Creates clean, unstyled list for custom appearance.
+ */
 .doregister-country-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    list-style: none; /* Removes default bullet points */
+    margin: 0; /* Removes default margin */
+    padding: 0; /* Removes default padding */
 }
 
+/**
+ * Country List Item
+ * 
+ * Individual country option in the dropdown. Clickable item that
+ * selects the country when clicked.
+ * 
+ * Design Intent:
+ * - Generous padding (10px 15px) - Large clickable area
+ * - cursor: pointer - Indicates clickability
+ * - Smooth background transition - Hover effect
+ * 
+ * Interaction:
+ * - JavaScript handles click to select country
+ * - Hover state provides visual feedback
+ */
 .doregister-country-item {
-    padding: 10px 15px;
-    cursor: pointer;
-    transition: background 0.2s ease;
+    padding: 10px 15px; /* Clickable area padding */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    transition: background 0.2s ease; /* Smooth hover background change */
 }
 
+/**
+ * Country Item Hover State
+ * 
+ * Visual feedback when hovering over country option.
+ * Light gray background indicates interactive element.
+ */
 .doregister-country-item:hover {
-    background: #f5f5f5;
+    background: #f5f5f5; /* Light gray background on hover */
 }
 
-/* Password Strength */
+/* ==========================================================================
+   COMPONENTS: Password Strength Meter
+   ========================================================================== */
+
+/**
+ * Password Strength Container
+ * 
+ * Container for password strength indicator ("Weak", "Medium", "Strong").
+ * Hidden by default, shown when user types in password field.
+ * 
+ * Design Intent:
+ * - Small font (12px) - Secondary information
+ * - Bold weight (600) - Emphasizes strength level
+ * - opacity: 0 (default) - Hidden until password is entered
+ * - Smooth opacity transition - Fades in smoothly
+ * 
+ * Interaction:
+ * - JavaScript updates text and adds color class based on strength
+ * - .doregister-visible class makes it appear
+ */
 .doregister-password-strength {
-    margin-top: 5px;
-    font-size: 12px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.3s ease;
+    margin-top: 5px; /* Small spacing from password input */
+    font-size: 12px; /* Smaller font (secondary information) */
+    font-weight: 600; /* Bold for emphasis */
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease; /* Smooth fade-in animation */
 }
 
+/**
+ * Visible Password Strength State
+ * 
+ * Makes strength meter visible when password is being entered.
+ * Applied by JavaScript when password field has value.
+ */
 .doregister-password-strength.doregister-visible {
-    opacity: 1;
+    opacity: 1; /* Fully visible when password is entered */
 }
 
+/**
+ * Weak Password State
+ * 
+ * Red color indicates weak password (0-2 criteria met).
+ * Warns user that password needs improvement.
+ */
 .doregister-password-strength.doregister-weak {
-    color: #e74c3c;
+    color: #e74c3c; /* Red (warning color, matches error color) */
 }
 
+/**
+ * Medium Password State
+ * 
+ * Orange color indicates medium password strength (3 criteria met).
+ * Indicates acceptable but could be stronger.
+ */
 .doregister-password-strength.doregister-medium {
-    color: #f39c12;
+    color: #f39c12; /* Orange (warning, but less severe than red) */
 }
 
+/**
+ * Strong Password State
+ * 
+ * Green color indicates strong password (4 criteria met).
+ * Confirms password meets security requirements.
+ */
 .doregister-password-strength.doregister-strong {
-    color: #27ae60;
+    color: #27ae60; /* Green (success color, indicates strong password) */
 }
 
-/* Image Preview */
+/* ==========================================================================
+   COMPONENTS: Image Preview
+   ========================================================================== */
+
+/**
+ * Image Preview Container
+ * 
+ * Container for profile photo preview shown after file selection.
+ * Appears below file input to show selected image before upload.
+ * 
+ * Design Intent:
+ * - margin-top: 15px - Spacing from file input above
+ * - Provides visual confirmation of selected image
+ */
 .doregister-image-preview {
-    margin-top: 15px;
+    margin-top: 15px; /* Spacing from file input */
 }
 
+/**
+ * Preview Image
+ * 
+ * Styles the preview image displayed after file selection.
+ * Creates clean, bordered appearance matching form aesthetic.
+ */
 .doregister-image-preview img {
-    border-radius: 5px;
-    border: 2px solid #ddd;
+    border-radius: 5px; /* Rounded corners (matches input styling) */
+    border: 2px solid #ddd; /* Light border (matches input border) */
 }
 
-/* Review Summary */
+/* ==========================================================================
+   COMPONENTS: Review Summary (Step 5)
+   ========================================================================== */
+
+/**
+ * Review Summary Container
+ * 
+ * Container for Step 5 review summary showing all entered data.
+ * Provides read-only overview before final submission.
+ * 
+ * Design Intent:
+ * - Light background (#f9f9f9) - Subtle distinction from form
+ * - Generous padding (20px) - Comfortable reading space
+ * - Rounded corners (5px) - Matches form aesthetic
+ * - margin-bottom: 20px - Spacing before navigation buttons
+ */
 .doregister-review-summary {
-    background: #f9f9f9;
-    padding: 20px;
-    border-radius: 5px;
-    margin-bottom: 20px;
+    background: #f9f9f9; /* Light gray background (subtle distinction) */
+    padding: 20px; /* Internal spacing */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 20px; /* Spacing before buttons */
 }
 
+/**
+ * Review Item
+ * 
+ * Individual data item in review summary (e.g., "Full Name: John Doe").
+ * Creates clear separation between items with borders.
+ * 
+ * Design Intent:
+ * - Vertical padding (10px 0) - Spacing between items
+ * - Bottom border - Visual separator between items
+ * - Last child has no border - Clean ending
+ */
 .doregister-review-item {
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
+    padding: 10px 0; /* Vertical spacing (top, bottom) */
+    border-bottom: 1px solid #eee; /* Subtle border between items */
 }
 
+/**
+ * Last Review Item
+ * 
+ * Removes border from last item for clean appearance.
+ * Prevents unnecessary border at bottom of summary.
+ */
 .doregister-review-item:last-child {
-    border-bottom: none;
+    border-bottom: none; /* No border on last item */
 }
 
+/**
+ * Review Item Label
+ * 
+ * Styles the label portion (e.g., "Full Name:") in review items.
+ * Creates consistent alignment with min-width.
+ * 
+ * Design Intent:
+ * - inline-block - Allows min-width while staying inline
+ * - min-width: 150px - Consistent label width (aligned appearance)
+ * - Dark color (#333) - Good contrast for readability
+ */
 .doregister-review-item strong {
-    display: inline-block;
-    min-width: 150px;
-    color: #333;
+    display: inline-block; /* Allows min-width while staying inline */
+    min-width: 150px; /* Consistent label width (alignment) */
+    color: #333; /* Dark gray for readability */
 }
 
+/**
+ * Review Item Image
+ * 
+ * Styles profile photo thumbnail in review summary.
+ * Provides spacing from label above.
+ */
 .doregister-review-item img {
-    margin-top: 10px;
+    margin-top: 10px; /* Spacing from label above */
 }
 
-/* Form Navigation */
+/* ==========================================================================
+   COMPONENTS: Form Navigation Buttons
+   ========================================================================== */
+
+/**
+ * Navigation Button Container
+ * 
+ * Flexbox container for Next/Back/Submit buttons.
+ * Arranges buttons horizontally with space between.
+ * 
+ * Design Intent:
+ * - display: flex - Horizontal button layout
+ * - justify-content: space-between - Back button left, Next/Submit right
+ * - gap: 15px - Spacing between buttons (modern CSS)
+ * - margin-top: 30px - Spacing from form content above
+ */
 .doregister-form-navigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 30px;
-    gap: 15px;
+    display: flex; /* Flexbox for horizontal layout */
+    justify-content: space-between; /* Back button left, Next/Submit right */
+    margin-top: 30px; /* Spacing from form content */
+    gap: 15px; /* Spacing between buttons */
 }
 
+/**
+ * Base Button Styles
+ * 
+ * Common styles for all buttons (Next, Back, Submit, Logout).
+ * Creates consistent appearance and interaction across all buttons.
+ * 
+ * Design Intent:
+ * - Generous padding (12px 30px) - Comfortable click target
+ * - No border - Clean, modern appearance
+ * - Rounded corners (5px) - Matches form aesthetic
+ * - Bold text (600) - Clear, readable button text
+ * - Smooth transitions - All properties animate smoothly
+ * - inline-block - Allows width/height control
+ * 
+ * Interaction:
+ * - Hover states change background, add shadow, transform
+ * - Disabled state reduces opacity and changes cursor
+ */
 .doregister-btn {
-    padding: 12px 30px;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
+    padding: 12px 30px; /* Comfortable click target (vertical, horizontal) */
+    border: none; /* No border (clean appearance) */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    font-weight: 600; /* Semi-bold for emphasis */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    transition: all 0.3s ease; /* Smooth animation for all properties */
+    text-decoration: none; /* No underline (if used as link) */
+    display: inline-block; /* Allows width/height control */
 }
 
+/**
+ * Next and Submit Buttons
+ * 
+ * Primary action buttons (green). Used for forward navigation and submission.
+ * Positioned on the right side of navigation container.
+ * 
+ * Design Intent:
+ * - Green background (#4CAF50) - Primary action color (brand consistency)
+ * - White text - High contrast for readability
+ * - margin-left: auto - Pushes to right side (flexbox)
+ * 
+ * Visual Hierarchy:
+ * - Green color indicates primary/positive action
+ * - Positioned right (standard for forward actions)
+ */
 .doregister-btn-next,
 .doregister-btn-submit {
-    background: #4CAF50;
-    color: #fff;
-    margin-left: auto;
+    background: #4CAF50; /* Primary green color */
+    color: #fff; /* White text (high contrast) */
+    margin-left: auto; /* Pushes to right side (flexbox) */
 }
 
+/**
+ * Next/Submit Button Hover State
+ * 
+ * Enhanced hover effect for primary buttons.
+ * Creates elevation effect with shadow and slight upward movement.
+ * 
+ * Design Intent:
+ * - Darker green (#45a049) - Visual feedback on hover
+ * - translateY(-2px) - Slight upward movement (elevation effect)
+ * - Box shadow - Creates depth, draws attention
+ * - Smooth transition - All changes animate smoothly
+ */
 .doregister-btn-next:hover,
 .doregister-btn-submit:hover {
-    background: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+    background: #45a049; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight upward movement (elevation) */
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3); /* Green shadow (depth effect) */
 }
 
+/**
+ * Back Button
+ * 
+ * Secondary action button (gray). Used for backward navigation.
+ * Positioned on the left side of navigation container.
+ * 
+ * Design Intent:
+ * - Gray background (#757575) - Secondary action color (less prominent)
+ * - White text - High contrast
+ * - Visual hierarchy: Less prominent than primary green buttons
+ */
 .doregister-btn-back {
-    background: #757575;
-    color: #fff;
+    background: #757575; /* Gray (secondary action) */
+    color: #fff; /* White text */
 }
 
+/**
+ * Back Button Hover State
+ * 
+ * Darker gray on hover for visual feedback.
+ * Simpler than primary buttons (no elevation effect).
+ */
 .doregister-btn-back:hover {
-    background: #616161;
+    background: #616161; /* Darker gray on hover */
 }
 
+/**
+ * Disabled Button State
+ * 
+ * Applied when button is disabled (e.g., during form submission).
+ * Provides visual feedback that action is not available.
+ * 
+ * Design Intent:
+ * - Reduced opacity (0.6) - Indicates disabled state
+ * - not-allowed cursor - Clear indication action is unavailable
+ * - transform: none - Prevents hover effects when disabled
+ */
 .doregister-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+    opacity: 0.6; /* Reduced opacity (disabled appearance) */
+    cursor: not-allowed; /* Not-allowed cursor (indicates disabled) */
+    transform: none; /* Prevents hover transform when disabled */
 }
 
+/**
+ * Logout Button
+ * 
+ * Destructive action button (red). Used for logout functionality.
+ * Red color indicates potentially destructive action.
+ * 
+ * Design Intent:
+ * - Red background (#e74c3c) - Destructive action color (universal recognition)
+ * - White text - High contrast
+ * - Visual warning: Red indicates action should be considered
+ */
 .doregister-btn-logout {
-    background: #e74c3c;
-    color: #fff;
+    background: #e74c3c; /* Red (destructive action) */
+    color: #fff; /* White text */
 }
 
+/**
+ * Logout Button Hover State
+ * 
+ * Darker red on hover for visual feedback.
+ */
 .doregister-btn-logout:hover {
-    background: #c0392b;
+    background: #c0392b; /* Darker red on hover */
 }
 
-/* Form Messages */
+/* ==========================================================================
+   COMPONENTS: Form Messages (Success/Error)
+   ========================================================================== */
+
+/**
+ * Message Container
+ * 
+ * Container for success and error messages displayed after form actions.
+ * Provides spacing from form content above.
+ */
 .doregister-form-messages {
-    margin-top: 20px;
+    margin-top: 20px; /* Spacing from form content */
 }
 
+/**
+ * Base Message Styles
+ * 
+ * Common styles for all messages (success and error).
+ * Creates consistent appearance and spacing.
+ * 
+ * Design Intent:
+ * - Generous padding (12px 15px) - Comfortable reading space
+ * - Rounded corners (5px) - Matches form aesthetic
+ * - margin-bottom: 15px - Spacing between multiple messages
+ * - Standard font size (14px) - Readable but not dominant
+ */
 .doregister-message {
-    padding: 12px 15px;
-    border-radius: 5px;
-    margin-bottom: 15px;
-    font-size: 14px;
+    padding: 12px 15px; /* Internal spacing */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 15px; /* Spacing between messages */
+    font-size: 14px; /* Standard readable size */
 }
 
+/**
+ * Success Message
+ * 
+ * Styles success messages (e.g., "Registration successful").
+ * Uses green color scheme for positive feedback.
+ * 
+ * Design Intent:
+ * - Light green background (#d4edda) - Subtle, positive appearance
+ * - Dark green text (#155724) - High contrast for readability
+ * - Green border (#c3e6cb) - Defines message boundaries
+ * - Bootstrap-inspired color scheme (familiar to users)
+ */
 .doregister-message.doregister-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    background: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text (high contrast) */
+    border: 1px solid #c3e6cb; /* Green border */
 }
 
+/**
+ * Error Message
+ * 
+ * Styles error messages (e.g., "Registration failed").
+ * Uses red color scheme for negative feedback.
+ * 
+ * Design Intent:
+ * - Light red background (#f8d7da) - Subtle, warning appearance
+ * - Dark red text (#721c24) - High contrast for readability
+ * - Red border (#f5c6cb) - Defines message boundaries
+ * - Bootstrap-inspired color scheme (familiar to users)
+ */
 .doregister-message.doregister-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+    background: #f8d7da; /* Light red background */
+    color: #721c24; /* Dark red text (high contrast) */
+    border: 1px solid #f5c6cb; /* Red border */
 }
 
-/* Form Footer */
+/* ==========================================================================
+   COMPONENTS: Form Footer (Navigation Links)
+   ========================================================================== */
+
+/**
+ * Form Footer Container
+ * 
+ * Footer section containing navigation links between login/registration pages.
+ * Separated from main form with border and spacing.
+ * 
+ * Design Intent:
+ * - margin-top: 25px - Spacing from form content
+ * - Centered text - Balanced appearance
+ * - Top border - Visual separation from form
+ * - padding-top: 20px - Spacing above border
+ */
 .doregister-form-footer {
-    margin-top: 25px;
-    text-align: center;
-    padding-top: 20px;
-    border-top: 1px solid #eee;
+    margin-top: 25px; /* Spacing from form content */
+    text-align: center; /* Center-aligns footer content */
+    padding-top: 20px; /* Spacing above border */
+    border-top: 1px solid #eee; /* Subtle top border (separation) */
 }
 
+/**
+ * Footer Paragraph
+ * 
+ * Styles paragraph text in footer (e.g., "Don't have an account?").
+ * Creates subtle, secondary text appearance.
+ */
 .doregister-form-footer p {
-    margin: 0;
-    color: #666;
-    font-size: 14px;
+    margin: 0; /* Removes default paragraph margin */
+    color: #666; /* Light gray (secondary text) */
+    font-size: 14px; /* Standard readable size */
 }
 
+/**
+ * Navigation Links
+ * 
+ * Links for navigating between login and registration pages.
+ * Uses primary green color to indicate interactive element.
+ * 
+ * Design Intent:
+ * - Green color (#4CAF50) - Matches primary action color (brand consistency)
+ * - No underline (default) - Clean appearance
+ * - Bold weight (600) - Emphasizes clickability
+ * - Smooth color transition - Hover effect
+ */
 .doregister-link-to-login,
 .doregister-link-to-register {
-    color: #4CAF50;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s ease;
+    color: #4CAF50; /* Primary green color */
+    text-decoration: none; /* No underline (clean appearance) */
+    font-weight: 600; /* Semi-bold for emphasis */
+    transition: color 0.3s ease; /* Smooth color change on hover */
 }
 
+/**
+ * Navigation Link Hover State
+ * 
+ * Darker green and underline on hover for clear feedback.
+ * Indicates clickable element.
+ */
 .doregister-link-to-login:hover,
 .doregister-link-to-register:hover {
-    color: #45a049;
-    text-decoration: underline;
+    color: #45a049; /* Darker green on hover */
+    text-decoration: underline; /* Underline on hover (indicates clickable) */
 }
 
-/* Profile Page - Modern Design */
+/* ==========================================================================
+   LAYOUT: Profile Page
+   ========================================================================== */
+
+/**
+ * Profile Page Wrapper
+ * 
+ * Overrides base wrapper styles for profile page.
+ * Profile page has different layout requirements (wider, no background).
+ * 
+ * Design Intent:
+ * - Wider max-width (900px) - More space for profile content
+ * - No padding - Content sections handle their own padding
+ * - Transparent background - No card appearance (sections have backgrounds)
+ * - No box-shadow - Sections have their own shadows
+ * 
+ * Note: This overrides the shared wrapper styles at the top of the file.
+ */
 .doregister-profile-wrapper {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0;
-    background: transparent;
-    box-shadow: none;
+    max-width: 900px; /* Wider than forms (more content space) */
+    margin: 40px auto; /* Vertical spacing + horizontal centering */
+    padding: 0; /* No padding (sections handle their own) */
+    background: transparent; /* No background (sections have backgrounds) */
+    box-shadow: none; /* No shadow (sections have their own) */
 }
 
+/**
+ * Profile Page Title
+ * 
+ * Main heading for profile page ("My Profile").
+ * Creates strong visual hierarchy with large size and decorative underline.
+ * 
+ * Design Intent:
+ * - Large font (32px) - Strong hierarchy, page title prominence
+ * - Bold weight (700) - Maximum emphasis
+ * - Dark color (#2c3e50) - Professional, readable
+ * - Centered - Balanced appearance
+ * - Decorative underline - Visual interest, brand color accent
+ * 
+ * Visual Hierarchy:
+ * - Largest text on page (establishes importance)
+ * - Decorative element draws attention
+ */
 .doregister-profile-wrapper h2 {
-    text-align: center;
-    font-size: 32px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 40px;
-    position: relative;
-    padding-bottom: 15px;
+    text-align: center; /* Center-aligns title */
+    font-size: 32px; /* Large font (page title hierarchy) */
+    font-weight: 700; /* Bold (maximum emphasis) */
+    color: #2c3e50; /* Dark blue-gray (professional appearance) */
+    margin-bottom: 40px; /* Spacing before profile content */
+    position: relative; /* Positioning context for ::after pseudo-element */
+    padding-bottom: 15px; /* Space for decorative underline */
 }
 
+/**
+ * Profile Title Decorative Underline
+ * 
+ * Pseudo-element creating decorative green underline below title.
+ * Adds visual interest and brand color accent.
+ * 
+ * Design Intent:
+ * - Green gradient - Brand color accent
+ * - Centered - Balanced appearance
+ * - Small width (60px) - Subtle, not overwhelming
+ * - Thin height (4px) - Decorative, not heavy
+ * 
+ * Technique:
+ * - ::after pseudo-element - No extra HTML needed
+ * - Absolute positioning - Positioned relative to h2
+ * - transform: translateX(-50%) - Perfect centering
+ */
 .doregister-profile-wrapper h2::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, #4CAF50, #45a049);
-    border-radius: 2px;
+    content: ''; /* Empty content (pseudo-element) */
+    position: absolute; /* Positioned relative to h2 */
+    bottom: 0; /* At bottom of h2 */
+    left: 50%; /* Starts at center */
+    transform: translateX(-50%); /* Shifts left by 50% of own width (perfect centering) */
+    width: 60px; /* Decorative underline width */
+    height: 4px; /* Thin underline height */
+    background: linear-gradient(90deg, #4CAF50, #45a049); /* Green gradient */
+    border-radius: 2px; /* Slightly rounded corners */
 }
 
+/**
+ * Profile Header Section
+ * 
+ * Top section of profile page containing photo, name, and email.
+ * Features gradient background and animated overlay for visual interest.
+ * 
+ * Design Intent:
+ * - Black-to-gray gradient - Modern, sophisticated appearance
+ * - Large padding (50px 40px) - Generous spacing for content
+ * - Rounded top corners only - Connects seamlessly with content below
+ * - White text - High contrast on dark background
+ * - Centered content - Balanced, focused appearance
+ * - Animated overlay - Subtle movement adds visual interest
+ * 
+ * Visual Hierarchy:
+ * - Dark background makes content stand out
+ * - Large padding creates breathing room
+ * - Centered layout focuses attention
+ */
 .doregister-profile-header {
-    background: linear-gradient(135deg, #000000 0%, #555555 100%);
-    padding: 50px 40px;
-    border-radius: 12px 12px 0 0;
-    text-align: center;
-    color: #fff;
-    margin-bottom: 0;
-    position: relative;
-    overflow: hidden;
+    background: linear-gradient(135deg, #000000 0%, #555555 100%); /* Black to gray gradient (diagonal) */
+    padding: 50px 40px; /* Generous spacing (vertical, horizontal) */
+    border-radius: 12px 12px 0 0; /* Rounded top corners only (connects with content) */
+    text-align: center; /* Center-aligns header content */
+    color: #fff; /* White text (high contrast on dark background) */
+    margin-bottom: 0; /* No bottom margin (seamless with content) */
+    position: relative; /* Positioning context for ::before pseudo-element */
+    overflow: hidden; /* Clips animated overlay to rounded corners */
 }
 
+/**
+ * Profile Header Animated Overlay
+ * 
+ * Pseudo-element creating subtle animated radial gradient overlay.
+ * Adds depth and visual interest without being distracting.
+ * 
+ * Design Intent:
+ * - Radial gradient - Creates light spot effect
+ * - Large size (200%) - Extends beyond header (clipped by overflow)
+ * - Positioned off-center - Creates dynamic appearance
+ * - Low opacity (0.1-0.8) - Subtle, not overwhelming
+ * - Slow animation (15s) - Gentle, non-distracting movement
+ * 
+ * Animation:
+ * - Pulses in and out over 15 seconds
+ * - Scales and fades for depth effect
+ * - Infinite loop - Continuous subtle movement
+ */
 .doregister-profile-header::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 200%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-    animation: pulse 15s ease-in-out infinite;
+    content: ''; /* Empty content (pseudo-element) */
+    position: absolute; /* Positioned relative to header */
+    top: -50%; /* Starts above header */
+    right: -50%; /* Starts to the right */
+    width: 200%; /* Large size (extends beyond header) */
+    height: 200%; /* Large size (extends beyond header) */
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%); /* Radial gradient (light spot) */
+    animation: pulse 15s ease-in-out infinite; /* Slow, continuous pulse animation */
 }
 
+/**
+ * Pulse Animation Keyframes
+ * 
+ * Defines the pulse animation for header overlay.
+ * Creates gentle scaling and opacity changes.
+ * 
+ * Animation Flow:
+ * - Start/End: Normal size (scale 1), half opacity (0.5)
+ * - Middle: Larger size (scale 1.1), higher opacity (0.8)
+ * - Ease-in-out: Smooth acceleration and deceleration
+ * - Infinite: Loops continuously
+ */
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.5; }
-    50% { transform: scale(1.1); opacity: 0.8; }
+    0%, 100% { transform: scale(1); opacity: 0.5; } /* Start/end: normal size, half opacity */
+    50% { transform: scale(1.1); opacity: 0.8; } /* Middle: larger, more visible */
 }
 
+/**
+ * Profile Photo Container
+ * 
+ * Container for profile photo in header. Positioned above name/email.
+ * Uses relative positioning and z-index to appear above animated overlay.
+ * 
+ * Design Intent:
+ * - inline-block - Allows centering while maintaining block properties
+ * - z-index: 1 - Appears above animated overlay (::before)
+ * - margin-bottom: 20px - Spacing before name/email
+ */
 .doregister-profile-photo {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 20px;
-    z-index: 1;
+    position: relative; /* Positioning context for z-index */
+    display: inline-block; /* Allows centering while maintaining block properties */
+    margin-bottom: 20px; /* Spacing before name/email */
+    z-index: 1; /* Appears above animated overlay */
 }
 
+/**
+ * Profile Photo Image
+ * 
+ * Styles the actual profile photo image.
+ * Creates rounded rectangle appearance with border and shadow.
+ * 
+ * Design Intent:
+ * - Square dimensions (200px) - Consistent appearance
+ * - Rounded rectangle (20px) - Modern, soft appearance (not circle)
+ * - object-fit: cover - Fills container while maintaining aspect ratio
+ * - Semi-transparent white border - Subtle frame effect
+ * - Large shadow - Creates depth, separates from background
+ * - Hover scale - Interactive feedback
+ * 
+ * Visual Effect:
+ * - Rounded rectangle creates modern, card-like appearance
+ * - Shadow creates floating effect
+ * - Border adds subtle frame
+ */
 .doregister-profile-photo img {
-    width: 200px;
-    height: 200px;
-    border-radius: 20px;
-    object-fit: cover;
-    border: 6px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease;
+    width: 200px; /* Square width */
+    height: 200px; /* Square height */
+    border-radius: 20px; /* Rounded rectangle (not circle) */
+    object-fit: cover; /* Fills container, maintains aspect ratio, crops if needed */
+    border: 6px solid rgba(255, 255, 255, 0.3); /* Semi-transparent white border */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); /* Large shadow (depth effect) */
+    transition: transform 0.3s ease; /* Smooth scale animation */
 }
 
+/**
+ * Profile Photo Hover State
+ * 
+ * Slight scale increase on hover for interactive feedback.
+ * Indicates photo is a visual element (not just static image).
+ */
 .doregister-profile-photo:hover img {
-    transform: scale(1.05);
+    transform: scale(1.05); /* Slight scale increase on hover (5% larger) */
 }
 
+/**
+ * No Photo Placeholder
+ * 
+ * Placeholder displayed when user hasn't uploaded a profile photo.
+ * Matches photo dimensions and styling for consistency.
+ * 
+ * Design Intent:
+ * - Same dimensions as photo - Consistent layout
+ * - Semi-transparent background - Subtle appearance
+ * - Dashed border - Indicates placeholder state
+ * - Centered icon/text - Clear indication of missing photo
+ */
 .doregister-no-photo {
-    width: 200px;
-    height: 200px;
-    border-radius: 20px;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.9);
-    border: 6px solid rgba(255, 255, 255, 0.3);
-    font-size: 14px;
-    font-weight: 500;
+    width: 200px; /* Matches photo width */
+    height: 200px; /* Matches photo height */
+    border-radius: 20px; /* Matches photo border-radius */
+    background: rgba(255, 255, 255, 0.2); /* Semi-transparent white background */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
+    color: rgba(255, 255, 255, 0.9); /* Semi-transparent white text */
+    border: 6px solid rgba(255, 255, 255, 0.3); /* Matches photo border */
+    font-size: 14px; /* Readable placeholder text */
+    font-weight: 500; /* Medium weight */
 }
 
+/**
+ * Profile Name
+ * 
+ * User's full name displayed in header below photo.
+ * Large, bold text for strong hierarchy.
+ * 
+ * Design Intent:
+ * - Large font (28px) - Strong hierarchy, name prominence
+ * - Bold weight (700) - Maximum emphasis
+ * - z-index: 1 - Appears above animated overlay
+ * - Spacing (15px top, 10px bottom) - Balanced spacing around name
+ */
 .doregister-profile-name {
-    font-size: 28px;
-    font-weight: 700;
-    margin: 15px 0 10px;
-    z-index: 1;
-    position: relative;
+    font-size: 28px; /* Large font (name hierarchy) */
+    font-weight: 700; /* Bold (maximum emphasis) */
+    margin: 15px 0 10px; /* Spacing (top, bottom) */
+    z-index: 1; /* Appears above animated overlay */
+    position: relative; /* Positioning context for z-index */
 }
 
+/**
+ * Profile Email
+ * 
+ * User's email address displayed below name.
+ * Smaller, lighter text for secondary information.
+ * 
+ * Design Intent:
+ * - Smaller font (16px) - Secondary information (less prominent than name)
+ * - Reduced opacity (0.9) - Subtle appearance
+ * - z-index: 1 - Appears above animated overlay
+ */
 .doregister-profile-email {
-    font-size: 16px;
-    opacity: 0.9;
-    z-index: 1;
-    position: relative;
+    font-size: 16px; /* Smaller font (secondary information) */
+    opacity: 0.9; /* Slightly transparent (subtle appearance) */
+    z-index: 1; /* Appears above animated overlay */
+    position: relative; /* Positioning context for z-index */
 }
 
+/**
+ * Profile Content Container
+ * 
+ * Main content area below header. Contains categorized profile information.
+ * Uses flexbox for vertical layout of category sections.
+ * 
+ * Design Intent:
+ * - White background - Clean, readable content area
+ * - Rounded bottom corners only - Seamlessly connects with header above
+ * - Large padding (40px) - Generous spacing for content
+ * - Subtle shadow - Creates depth, separates from background
+ * - Flexbox column layout - Vertical stacking of categories
+ * - gap: 30px - Consistent spacing between categories
+ * 
+ * Visual Hierarchy:
+ * - White background contrasts with dark header
+ * - Shadow creates elevation effect
+ */
 .doregister-profile-content {
-    background: #fff;
-    border-radius: 0 0 12px 12px;
-    padding: 40px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    margin-top: 0;
+    background: #fff; /* White background (content area) */
+    border-radius: 0 0 12px 12px; /* Rounded bottom corners only (connects with header) */
+    padding: 40px; /* Generous internal spacing */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); /* Subtle shadow (depth effect) */
+    display: flex; /* Flexbox layout */
+    flex-direction: column; /* Vertical stacking */
+    gap: 30px; /* Spacing between category sections */
+    margin-top: 0; /* No top margin (seamless with header) */
 }
 
+/**
+ * Profile Category Section
+ * 
+ * Individual category container (e.g., "Basic Information", "Contact Details").
+ * Each category groups related profile fields together.
+ * 
+ * Design Intent:
+ * - Light background (#f8f9fa) - Subtle distinction from content area
+ * - Rounded corners (12px) - Modern, card-like appearance
+ * - Border - Defines category boundaries
+ * - Hover effect - Interactive feedback (elevation on hover)
+ * 
+ * Interaction:
+ * - Hover adds shadow and slight upward movement
+ * - Creates engaging, interactive feel
+ */
 .doregister-profile-category {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 25px;
-    border: 1px solid #e9ecef;
-    transition: all 0.3s ease;
+    background: #f8f9fa; /* Light gray background (subtle distinction) */
+    border-radius: 12px; /* Rounded corners (card-like appearance) */
+    padding: 25px; /* Internal spacing */
+    border: 1px solid #e9ecef; /* Subtle border (defines boundaries) */
+    transition: all 0.3s ease; /* Smooth hover animation */
 }
 
+/**
+ * Category Hover State
+ * 
+ * Elevation effect on hover. Creates interactive, engaging feel.
+ * Shadow and transform provide visual feedback.
+ */
 .doregister-profile-category:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Shadow on hover (elevation) */
+    transform: translateY(-2px); /* Slight upward movement (elevation effect) */
 }
 
+/**
+ * Category Title
+ * 
+ * Heading for each category section (e.g., "Basic Information").
+ * Creates clear visual hierarchy and section identification.
+ * 
+ * Design Intent:
+ * - Large font (20px) - Clear hierarchy within category
+ * - Bold weight (700) - Strong emphasis
+ * - Green underline - Brand color accent, visual separator
+ * - Decorative arrow (::before) - Visual interest, brand color
+ * - Flexbox layout - Aligns arrow with text
+ * 
+ * Visual Hierarchy:
+ * - Large, bold text establishes category importance
+ * - Green accent creates brand consistency
+ */
 .doregister-profile-category-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 0 0 20px 0;
-    padding-bottom: 12px;
-    border-bottom: 3px solid #4CAF50;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 20px; /* Large font (category hierarchy) */
+    font-weight: 700; /* Bold (strong emphasis) */
+    color: #2c3e50; /* Dark blue-gray (professional appearance) */
+    margin: 0 0 20px 0; /* Spacing (top, bottom) */
+    padding-bottom: 12px; /* Space for underline */
+    border-bottom: 3px solid #4CAF50; /* Green underline (brand accent) */
+    display: flex; /* Flexbox for arrow alignment */
+    align-items: center; /* Vertically centers arrow with text */
+    gap: 10px; /* Spacing between arrow and text */
 }
 
+/**
+ * Category Title Decorative Arrow
+ * 
+ * Pseudo-element adding green arrow (▸) before category title.
+ * Adds visual interest and brand color accent.
+ */
 .doregister-profile-category-title::before {
-    content: '▸';
-    color: #4CAF50;
-    font-size: 18px;
+    content: '▸'; /* Right-pointing arrow character */
+    color: #4CAF50; /* Green (brand color) */
+    font-size: 18px; /* Slightly smaller than title */
 }
 
 .doregister-profile-category-content {
@@ -549,68 +1479,158 @@
     border: 2px dashed #adb5bd;
 }
 
+/**
+ * Profile Field Item
+ * 
+ * Individual field display within categories (e.g., "Full Name: John Doe").
+ * Creates card-like appearance with left border accent.
+ * 
+ * Design Intent:
+ * - Light background (#f8f9fa) - Subtle distinction
+ * - Generous padding (20px 25px) - Comfortable reading space
+ * - Green left border (4px) - Brand color accent, visual separator
+ * - Flexbox layout - Label and value side-by-side
+ * - Hover effect - Interactive feedback (slide right, shadow)
+ * 
+ * Visual Effect:
+ * - Left border creates visual interest
+ * - Hover creates engaging interaction
+ * - Card-like appearance groups label and value
+ */
 .doregister-profile-field {
-    background: #f8f9fa;
-    padding: 20px 25px;
-    border-radius: 10px;
-    margin-bottom: 15px;
-    border-left: 4px solid #4CAF50;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 15px;
+    background: #f8f9fa; /* Light gray background */
+    padding: 20px 25px; /* Generous spacing (vertical, horizontal) */
+    border-radius: 10px; /* Rounded corners */
+    margin-bottom: 15px; /* Spacing between fields */
+    border-left: 4px solid #4CAF50; /* Green left border (brand accent) */
+    transition: all 0.3s ease; /* Smooth hover animation */
+    display: flex; /* Flexbox for horizontal layout */
+    align-items: center; /* Vertically centers label and value */
+    gap: 15px; /* Spacing between label and value */
 }
 
+/**
+ * Profile Field Hover State
+ * 
+ * Interactive hover effect. Slides field slightly right and adds shadow.
+ * Creates engaging, interactive feel.
+ */
 .doregister-profile-field:hover {
-    background: #f0f4f8;
-    transform: translateX(5px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: #f0f4f8; /* Slightly lighter background on hover */
+    transform: translateX(5px); /* Slides 5px to the right (interactive effect) */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Subtle shadow (elevation) */
 }
 
+/**
+ * Last Profile Field
+ * 
+ * Removes bottom margin from last field in category.
+ * Prevents unnecessary spacing at category end.
+ */
 .doregister-profile-field:last-child {
-    margin-bottom: 0;
+    margin-bottom: 0; /* No bottom margin on last field */
 }
 
+/**
+ * Profile Field Label
+ * 
+ * Styles the label portion (e.g., "FULL NAME") in profile fields.
+ * Creates consistent, uppercase label appearance.
+ * 
+ * Design Intent:
+ * - min-width: 140px - Consistent label width (aligned appearance)
+ * - Uppercase text - Emphasizes label, creates hierarchy
+ * - Letter spacing (0.5px) - Improves uppercase readability
+ * - Small font (14px) - Secondary information
+ * - Decorative arrow - Visual interest, brand color
+ */
 .doregister-profile-field strong {
-    min-width: 140px;
-    color: #2c3e50;
-    font-weight: 600;
-    font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    min-width: 140px; /* Consistent label width (alignment) */
+    color: #2c3e50; /* Dark blue-gray */
+    font-weight: 600; /* Semi-bold */
+    font-size: 14px; /* Smaller font (label hierarchy) */
+    text-transform: uppercase; /* Uppercase text (emphasis) */
+    letter-spacing: 0.5px; /* Spacing between letters (readability) */
+    display: flex; /* Flexbox for arrow alignment */
+    align-items: center; /* Vertically centers arrow with text */
+    gap: 8px; /* Spacing between arrow and text */
 }
 
+/**
+ * Profile Field Label Arrow
+ * 
+ * Decorative green arrow before field label.
+ * Adds visual interest and brand consistency.
+ */
 .doregister-profile-field strong::before {
-    content: '▸';
-    color: #4CAF50;
-    font-size: 12px;
+    content: '▸'; /* Right-pointing arrow */
+    color: #4CAF50; /* Green (brand color) */
+    font-size: 12px; /* Smaller than label text */
 }
 
+/**
+ * Profile Field Value
+ * 
+ * Styles the value portion (e.g., "John Doe") in profile fields.
+ * Takes remaining space with flex: 1.
+ * 
+ * Design Intent:
+ * - Larger font (15px) - Primary information (more prominent than label)
+ * - Medium weight (500) - Readable emphasis
+ * - flex: 1 - Takes remaining space (flexbox)
+ * - Dark color (#34495e) - Good contrast for readability
+ */
 .doregister-profile-field span {
-    color: #34495e;
-    font-size: 15px;
-    font-weight: 500;
-    flex: 1;
+    color: #34495e; /* Dark blue-gray (readable) */
+    font-size: 15px; /* Larger than label (value hierarchy) */
+    font-weight: 500; /* Medium weight */
+    flex: 1; /* Takes remaining space (flexbox) */
 }
 
+/**
+ * Interests Container
+ * 
+ * Flexbox container for interest tags/badges.
+ * Arranges interests horizontally with wrapping.
+ * 
+ * Design Intent:
+ * - Flexbox layout - Horizontal arrangement
+ * - flex-wrap: wrap - Wraps to new line when needed
+ * - Small gap (8px) - Tight spacing for badge appearance
+ * - margin-top: 8px - Spacing from label above
+ */
 .doregister-profile-interests {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
+    display: flex; /* Flexbox for horizontal layout */
+    flex-wrap: wrap; /* Allows wrapping to new line */
+    gap: 8px; /* Small spacing between badges */
+    margin-top: 8px; /* Spacing from label above */
 }
 
+/**
+ * Interest Badge/Tag
+ * 
+ * Individual interest displayed as a badge/tag.
+ * Uses black-to-gray gradient matching profile header.
+ * 
+ * Design Intent:
+ * - Pill shape (20px border-radius) - Modern badge appearance
+ * - Black-to-gray gradient - Matches profile header (visual consistency)
+ * - White text - High contrast on dark background
+ * - Small font (13px) - Compact badge appearance
+ * - Generous padding (6px 14px) - Comfortable badge size
+ * 
+ * Visual Consistency:
+ * - Gradient matches profile header gradient
+ * - Creates cohesive design language
+ */
 .doregister-profile-interests span {
-    background: linear-gradient(135deg, #000000 0%, #555555 100%);
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 13px;
-    font-weight: 500;
-    display: inline-block;
+    background: linear-gradient(135deg, #000000 0%, #555555 100%); /* Black to gray gradient (matches header) */
+    color: #fff; /* White text (high contrast) */
+    padding: 6px 14px; /* Badge padding (vertical, horizontal) */
+    border-radius: 20px; /* Pill shape (fully rounded) */
+    font-size: 13px; /* Small font (compact badge) */
+    font-weight: 500; /* Medium weight */
+    display: inline-block; /* Allows padding and border-radius */
 }
 
 .doregister-profile-actions {
@@ -633,78 +1653,187 @@
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
 }
 
-/* Responsive */
+/* ==========================================================================
+   RESPONSIVE: Mobile Styles
+   ========================================================================== */
+
+/**
+ * Mobile Breakpoint (max-width: 768px)
+ * 
+ * Responsive styles for tablets and mobile devices.
+ * Adjusts spacing, font sizes, and layout for smaller screens.
+ * 
+ * Design Intent:
+ * - Reduced margins/padding - Maximizes screen space
+ * - Smaller fonts - Better fit on small screens
+ * - Stacked layouts - Vertical stacking for narrow screens
+ * - Full-width buttons - Easier touch targets
+ * - Simplified hover effects - Better for touch devices
+ * 
+ * Breakpoint Choice:
+ * - 768px - Standard tablet/mobile breakpoint
+ * - Covers most mobile devices and small tablets
+ */
 @media (max-width: 768px) {
+    /**
+     * Form Wrappers - Mobile
+     * 
+     * Reduces margins and padding for mobile screens.
+     * Maximizes available space on small devices.
+     */
     .doregister-registration-wrapper,
     .doregister-login-wrapper {
-        margin: 20px;
-        padding: 20px;
+        margin: 20px; /* Reduced margin (was 40px auto) */
+        padding: 20px; /* Reduced padding (was 30px) */
     }
     
+    /**
+     * Profile Wrapper - Mobile
+     * 
+     * Reduces margin for mobile screens.
+     */
     .doregister-profile-wrapper {
-        margin: 20px;
+        margin: 20px; /* Reduced margin (was 40px auto) */
     }
     
+    /**
+     * Profile Title - Mobile
+     * 
+     * Smaller font size for mobile screens.
+     * Maintains hierarchy while fitting better on small screens.
+     */
     .doregister-profile-wrapper h2 {
-        font-size: 24px;
-        margin-bottom: 30px;
+        font-size: 24px; /* Smaller font (was 32px) */
+        margin-bottom: 30px; /* Reduced spacing (was 40px) */
     }
     
+    /**
+     * Profile Header - Mobile
+     * 
+     * Reduces padding for mobile screens.
+     * Maintains visual impact while using less space.
+     */
     .doregister-profile-header {
-        padding: 40px 20px;
+        padding: 40px 20px; /* Reduced padding (was 50px 40px) */
     }
     
+    /**
+     * Profile Photo - Mobile
+     * 
+     * Smaller photo size for mobile screens.
+     * Maintains aspect ratio and appearance.
+     */
     .doregister-profile-photo img,
     .doregister-no-photo {
-        width: 160px;
-        height: 160px;
-        border-radius: 15px;
+        width: 160px; /* Smaller (was 200px) */
+        height: 160px; /* Smaller (was 200px) */
+        border-radius: 15px; /* Slightly less rounded (was 20px) */
     }
     
+    /**
+     * Profile Name - Mobile
+     * 
+     * Smaller font size for mobile screens.
+     */
     .doregister-profile-name {
-        font-size: 22px;
+        font-size: 22px; /* Smaller font (was 28px) */
     }
     
+    /**
+     * Profile Content - Mobile
+     * 
+     * Reduces padding and gap for mobile screens.
+     * Maximizes content space.
+     */
     .doregister-profile-content {
-        padding: 25px 20px;
-        gap: 20px;
+        padding: 25px 20px; /* Reduced padding (was 40px) */
+        gap: 20px; /* Reduced gap (was 30px) */
     }
     
+    /**
+     * Profile Category - Mobile
+     * 
+     * Reduces padding for mobile screens.
+     */
     .doregister-profile-category {
-        padding: 20px 15px;
+        padding: 20px 15px; /* Reduced padding (was 25px) */
     }
     
+    /**
+     * Category Title - Mobile
+     * 
+     * Smaller font size for mobile screens.
+     */
     .doregister-profile-category-title {
-        font-size: 18px;
+        font-size: 18px; /* Smaller font (was 20px) */
     }
     
+    /**
+     * Profile Field - Mobile
+     * 
+     * Stacks label and value vertically on mobile.
+     * Improves readability on narrow screens.
+     * 
+     * Layout Change:
+     * - flex-direction: column - Stacks vertically
+     * - align-items: flex-start - Left-aligns stacked items
+     * - Reduced padding - Maximizes space
+     */
     .doregister-profile-field {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 15px 20px;
+        flex-direction: column; /* Stacks label and value vertically */
+        align-items: flex-start; /* Left-aligns stacked items */
+        padding: 15px 20px; /* Reduced padding (was 20px 25px) */
     }
     
+    /**
+     * Profile Field Label - Mobile
+     * 
+     * Removes min-width and adds bottom margin for stacked layout.
+     */
     .doregister-profile-field strong {
-        min-width: auto;
-        margin-bottom: 8px;
+        min-width: auto; /* No fixed width (was 140px) */
+        margin-bottom: 8px; /* Spacing when stacked vertically */
     }
     
+    /**
+     * Profile Field Hover - Mobile
+     * 
+     * Disables transform on mobile (better for touch devices).
+     * Hover effects are less relevant on touch screens.
+     */
     .doregister-profile-field:hover {
-        transform: none;
+        transform: none; /* No transform on mobile (was translateX(5px)) */
     }
     
+    /**
+     * Form Navigation - Mobile
+     * 
+     * Stacks buttons vertically on mobile.
+     * Full-width buttons are easier to tap.
+     */
     .doregister-form-navigation {
-        flex-direction: column;
+        flex-direction: column; /* Stacks buttons vertically */
     }
     
+    /**
+     * Next/Submit Buttons - Mobile
+     * 
+     * Full-width buttons on mobile for easier tapping.
+     * Removes left margin (no longer needed in column layout).
+     */
     .doregister-btn-next,
     .doregister-btn-submit {
-        margin-left: 0;
-        width: 100%;
+        margin-left: 0; /* No left margin (was auto) */
+        width: 100%; /* Full width (easier to tap) */
     }
     
+    /**
+     * Back Button - Mobile
+     * 
+     * Full-width button on mobile for easier tapping.
+     */
     .doregister-btn-back {
-        width: 100%;
+        width: 100%; /* Full width (easier to tap) */
     }
 }
 
