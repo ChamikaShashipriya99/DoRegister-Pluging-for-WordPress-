@@ -105,7 +105,7 @@ class DoRegister_Admin {
         }
 
         $page = isset($_GET['paged']) ? intval($_GET['paged']) : 1;
-        $per_page = 20;
+        $per_page = 10;
         $offset = ($page - 1) * $per_page;
         
         $users = DoRegister_Database::get_all_users($per_page, $offset);
@@ -113,7 +113,7 @@ class DoRegister_Admin {
         $total_pages = ceil($total_users / $per_page);
         
         ?>
-        <div class="wrap">
+        <div class="wrap doregister-admin-pagination">
             <h1>DoRegister - User Registrations</h1>
             
             <?php if (!DoRegister_Database::table_exists()): ?>
