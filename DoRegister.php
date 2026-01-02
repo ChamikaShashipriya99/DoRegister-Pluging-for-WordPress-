@@ -140,6 +140,7 @@ class DoRegister {
      * 
      * Initializes PHP session if not already started.
      * Required for custom authentication system (not using wp_users table).
+     * Also checks for persistent cookies to auto-login users with "Remember Me".
      * 
      * @since 1.0.0
      * @return void
@@ -147,6 +148,33 @@ class DoRegister {
     public function start_session() {
         if (!session_id()) {
             session_start();
+        }
+        
+        // AUTO-LOGIN: Check for persistent cookies (Remember Me)
+        // Only check if user is not already logged in via session
+        if (!isset($_SESSION['doregister_user_id']) && isset($_COOKIE['doregister_user_id']) && isset($_COOKIE['doregister_user_token'])) {
+            // Ensure required classes are loaded
+            require_once DOREGISTER_PLUGIN_DIR . 'includes/class-doregister-ajax.php';
+            require_once DOREGISTER_PLUGIN_DIR . 'includes/class-doregister-database.php';
+            
+            $cookie_user_id = intval($_COOKIE['doregister_user_id']);
+            $cookie_token = sanitize_text_field($_COOKIE['doregister_user_token']);
+            
+            // Verify token is valid
+            if (DoRegister_Ajax::verify_auth_token($cookie_user_id, $cookie_token)) {
+                // Token is valid - restore session from cookie
+                $_SESSION['doregister_user_id'] = $cookie_user_id;
+                
+                // Get user email for session
+                $user = DoRegister_Database::get_user_by_id($cookie_user_id);
+                if ($user) {
+                    $_SESSION['doregister_user_email'] = $user->email;
+                }
+            } else {
+                // Invalid token - clear cookies
+                setcookie('doregister_user_id', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+                setcookie('doregister_user_token', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            }
         }
     }
     

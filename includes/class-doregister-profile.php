@@ -90,9 +90,38 @@ class DoRegister_Profile {
         }
         
         // AUTHENTICATION CHECK: Verify user is logged in
-        // $_SESSION['doregister_user_id'] is set during login
-        // If not set, user is not logged in
-        if (!isset($_SESSION['doregister_user_id'])) {
+        // Check session first, then check persistent cookies for "Remember Me"
+        $user_id = null;
+        
+        // Check session (standard login)
+        if (isset($_SESSION['doregister_user_id'])) {
+            $user_id = intval($_SESSION['doregister_user_id']);
+        }
+        // Check persistent cookies (Remember Me login)
+        elseif (isset($_COOKIE['doregister_user_id']) && isset($_COOKIE['doregister_user_token'])) {
+            $cookie_user_id = intval($_COOKIE['doregister_user_id']);
+            $cookie_token = sanitize_text_field($_COOKIE['doregister_user_token']);
+            
+            // Verify token is valid
+            if (DoRegister_Ajax::verify_auth_token($cookie_user_id, $cookie_token)) {
+                // Token is valid - restore session from cookie
+                $user_id = $cookie_user_id;
+                $_SESSION['doregister_user_id'] = $user_id;
+                
+                // Get user email for session
+                $user = DoRegister_Database::get_user_by_id($user_id);
+                if ($user) {
+                    $_SESSION['doregister_user_email'] = $user->email;
+                }
+            } else {
+                // Invalid token - clear cookies
+                setcookie('doregister_user_id', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+                setcookie('doregister_user_token', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            }
+        }
+        
+        // If still not authenticated, show login prompt
+        if (!$user_id) {
             // User not logged in - show login prompt
             // home_url('/login'): Builds URL to login page (adjust '/login' to match your page slug)
             $login_url = home_url('/login');
@@ -101,11 +130,6 @@ class DoRegister_Profile {
             // esc_url(): Escapes URL for safe output (prevents XSS)
             return '<div class="doregister-message doregister-error">Please <a href="' . esc_url($login_url) . '" class="doregister-link-to-login">login</a> to view your profile.</div>';
         }
-        
-        // Get user ID from session
-        // intval(): Converts to integer (sanitization - prevents injection)
-        // $_SESSION['doregister_user_id'] was set during login
-        $user_id = intval($_SESSION['doregister_user_id']);
         
         // Retrieve user data from database
         // DoRegister_Database::get_user_by_id(): Static method to fetch user

@@ -141,6 +141,16 @@ class DoRegister_Login {
                     <span class="doregister-error-message"></span>
                 </div>
                 
+                <!-- Remember Me Checkbox -->
+                <div class="doregister-field-group">
+                    <!-- Remember Me checkbox for persistent login -->
+                    <!-- Allows user to stay logged in across browser sessions -->
+                    <label class="doregister-remember-me-label">
+                        <input type="checkbox" id="remember_me" name="remember_me" class="doregister-checkbox">
+                        <span>Remember me</span>
+                    </label>
+                </div>
+                
                 <!-- Submit Button -->
                 <div class="doregister-field-group">
                     <!-- Submit button triggers form submission -->

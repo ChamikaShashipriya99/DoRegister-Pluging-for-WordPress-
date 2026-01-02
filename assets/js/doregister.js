@@ -1426,7 +1426,8 @@
                 action: 'doregister_login', // WordPress AJAX action
                 nonce: doregisterData.loginNonce, // Security token (different from registration)
                 login_email: $('#login_email').val(), // Email or username
-                login_password: $('#login_password').val() // Password
+                login_password: $('#login_password').val(), // Password
+                remember_me: $('#remember_me').is(':checked') ? 'true' : 'false' // Remember Me checkbox
             };
             
             // SHOW LOADING STATE

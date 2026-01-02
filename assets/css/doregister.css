@@ -541,6 +541,28 @@
     cursor: pointer; /* Pointer cursor for clickability */
 }
 
+/**
+ * Remember Me Label
+ * 
+ * Special styling for "Remember Me" checkbox in login form.
+ * Creates consistent appearance with other checkboxes.
+ * 
+ * Design Intent:
+ * - display: flex - Aligns checkbox and text horizontally
+ * - align-items: center - Vertically centers checkbox with text
+ * - cursor: pointer - Entire label is clickable
+ * - margin-bottom: 0 - No bottom margin (field group handles spacing)
+ */
+.doregister-remember-me-label {
+    display: flex; /* Flexbox for horizontal alignment */
+    align-items: center; /* Vertically centers checkbox with text */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    font-weight: normal; /* Regular weight (not bold) */
+    margin-bottom: 0; /* No bottom margin (field group handles spacing) */
+    font-size: 14px; /* Standard readable font size */
+    color: #333; /* Dark gray for readability */
+}
+
 /* ==========================================================================
    COMPONENTS: Country Searchable Dropdown
    ========================================================================== */

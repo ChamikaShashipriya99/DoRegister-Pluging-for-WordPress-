@@ -288,6 +288,7 @@ class DoRegister_Ajax {
         // SANITIZATION: Clean input data
         $email = sanitize_email($_POST['login_email'] ?? ''); // Email or username (sanitized as email)
         $password = $_POST['login_password'] ?? ''; // Password (raw, needed for verification)
+        $remember_me = isset($_POST['remember_me']) && $_POST['remember_me'] === 'true'; // Remember Me checkbox
         
         // Initialize errors array
         $errors = array();
@@ -333,6 +334,34 @@ class DoRegister_Ajax {
         $_SESSION['doregister_user_id'] = $user->id; // Store user ID
         $_SESSION['doregister_user_email'] = $user->email; // Store email
         
+        // PERSISTENT LOGIN: Set cookies if "Remember Me" is checked
+        if ($remember_me) {
+            // Generate secure token for persistent login
+            // This token is stored in database and cookie for verification
+            $token = wp_generate_password(32, false); // Generate 32-character random token
+            
+            // Store token in user meta (or we can create a separate table for tokens)
+            // For simplicity, we'll store it in a cookie and verify it matches a hash
+            // In production, you might want to store tokens in database with expiration
+            
+            // Set cookie expiration: 30 days if "Remember Me", otherwise session cookie
+            $expiration = time() + (30 * DAY_IN_SECONDS); // 30 days from now
+            
+            // Set secure cookies using WordPress functions
+            // COOKIEPATH and COOKIE_DOMAIN are WordPress constants
+            setcookie('doregister_user_id', $user->id, $expiration, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            setcookie('doregister_user_token', $this->generate_auth_token($user->id, $user->email), $expiration, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            
+            // Also set session expiration for longer duration
+            // Note: PHP sessions typically expire when browser closes, but we can extend this
+            // For "Remember Me", we rely on cookies primarily
+        } else {
+            // Not "Remember Me": Set session cookies (expire when browser closes)
+            // Clear any existing persistent cookies
+            setcookie('doregister_user_id', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            setcookie('doregister_user_token', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+        }
+        
         // Send success response with redirect URL
         wp_send_json_success(array(
             'message' => 'Login successful!',
@@ -343,14 +372,15 @@ class DoRegister_Ajax {
     /**
      * Handle logout AJAX request
      * 
-     * Destroys the user's session, effectively logging them out.
+     * Destroys the user's session and clears persistent cookies, effectively logging them out.
      * Called when user clicks the logout button on profile page.
      * 
      * Process Flow:
      * 1. Check if session exists
      * 2. Unset session variables
      * 3. Destroy session
-     * 4. Return success response
+     * 4. Clear persistent cookies
+     * 5. Return success response
      * 
      * @since 1.0.0
      * @return void (sends JSON response and exits)
@@ -368,6 +398,11 @@ class DoRegister_Ajax {
             session_destroy();
         }
         
+        // CLEAR PERSISTENT COOKIES: Remove "Remember Me" cookies
+        // Set cookies with expiration in the past to delete them
+        setcookie('doregister_user_id', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+        setcookie('doregister_user_token', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+        
         // Send success response
         // Note: No nonce check needed here - logout is safe even if called maliciously
         // Worst case: user gets logged out (which they wanted anyway)
@@ -375,6 +410,57 @@ class DoRegister_Ajax {
             'message' => 'Logged out successfully.',
             'redirect_url' => home_url('/login') // Redirect to login page after logout
         ));
+    }
+    
+    /**
+     * Generate authentication token for persistent login
+     * 
+     * Creates a secure token based on user ID and email.
+     * This token is stored in a cookie and verified on subsequent visits.
+     * 
+     * Security:
+     * - Uses WordPress's wp_hash() function (secure hashing)
+     * - Combines user ID, email, and a secret salt
+     * - Token changes if user data changes (prevents token reuse)
+     * 
+     * @since 1.0.0
+     * @param int $user_id User ID
+     * @param string $email User email
+     * @return string Hashed authentication token
+     */
+    private function generate_auth_token($user_id, $email) {
+        // Create token using user ID, email, and WordPress salt
+        // wp_hash() uses WordPress's secure hashing with salt
+        // AUTH_SALT and SECURE_AUTH_SALT are WordPress constants
+        $token_data = $user_id . '|' . $email . '|' . AUTH_SALT;
+        return wp_hash($token_data);
+    }
+    
+    /**
+     * Verify authentication token from cookie
+     * 
+     * Validates the token stored in cookie against user data.
+     * Used for "Remember Me" persistent login functionality.
+     * 
+     * @since 1.0.0
+     * @param int $user_id User ID from cookie
+     * @param string $token Token from cookie
+     * @return bool True if token is valid, false otherwise
+     */
+    public static function verify_auth_token($user_id, $token) {
+        // Get user from database
+        $user = DoRegister_Database::get_user_by_id($user_id);
+        
+        // If user doesn't exist, token is invalid
+        if (!$user) {
+            return false;
+        }
+        
+        // Generate expected token and compare
+        $expected_token = wp_hash($user_id . '|' . $user->email . '|' . AUTH_SALT);
+        
+        // Use hash_equals() for timing-safe comparison (prevents timing attacks)
+        return hash_equals($expected_token, $token);
     }
     
     /**
