@@ -494,12 +494,18 @@
          * 
          * Handles step transitions: Updates UI, progress bar, step indicator.
          * Saves current step to localStorage and triggers custom event.
+         * Implements slide animations based on navigation direction.
          * 
          * UI Updates:
          * - Hides current step (removes active class, adds hidden class)
-         * - Shows target step (removes hidden class, adds active class)
+         * - Shows target step (removes hidden class, adds active class with direction)
          * - Updates progress bar width (visual completion indicator)
          * - Updates step number text ("Step X of 5")
+         * 
+         * Animation:
+         * - Forward navigation (step > currentStep): Slides in from right
+         * - Backward navigation (step < currentStep): Slides in from left
+         * - Can be skipped for initial page load (skipAnimation = true)
          * 
          * Side Effects:
          * - Saves step to localStorage (for auto-restore on refresh)
@@ -507,25 +513,50 @@
          * 
          * @method goToStep
          * @param {number} step - Step number to navigate to (1-5)
+         * @param {boolean} skipAnimation - If true, skip animation (for initial load)
          * @returns {void}
          */
-        goToStep: function(step) {
+        goToStep: function(step, skipAnimation) {
             // Validate step number: Must be between 1 and totalSteps
             // Prevents navigation to invalid steps
             if (step < 1 || step > this.totalSteps) {
                 return; // Exit early if invalid step
             }
             
+            // Store previous step before updating (needed for direction detection)
+            var previousStep = this.currentStep;
+            
+            // Get references to current and target step elements
+            var $currentStep = $('.doregister-step[data-step="' + previousStep + '"]');
+            var $targetStep = $('.doregister-step[data-step="' + step + '"]');
+            
             // HIDE CURRENT STEP: Remove active class, add hidden class
             // CSS classes control visibility (doregister-step-active = visible, doregister-step-hidden = hidden)
-            $('.doregister-step[data-step="' + this.currentStep + '"]').removeClass('doregister-step-active').addClass('doregister-step-hidden');
+            $currentStep.removeClass('doregister-step-active slide-in-left slide-in-right').addClass('doregister-step-hidden');
             
             // SHOW NEW STEP: Update current step and show it
             // Update internal state first
             this.currentStep = step;
             
-            // Then update DOM: Remove hidden class, add active class
-            $('.doregister-step[data-step="' + step + '"]').removeClass('doregister-step-hidden').addClass('doregister-step-active');
+            // Remove any existing animation classes and hidden class
+            $targetStep.removeClass('doregister-step-hidden slide-in-left slide-in-right');
+            
+            // Add active class and direction-specific animation class (if not skipping animation)
+            if (!skipAnimation) {
+                // Determine navigation direction for animation
+                // Forward: step > previous step (e.g., Step 1 -> Step 2)
+                // Backward: step < previous step (e.g., Step 3 -> Step 2)
+                var isForward = step > previousStep;
+                var animationClass = isForward ? 'slide-in-right' : 'slide-in-left';
+                
+                // Add active class and direction-specific animation class
+                // This triggers the slide animation
+                $targetStep.addClass('doregister-step-active ' + animationClass);
+            } else {
+                // Skip animation: Just add active class without animation
+                // Used for initial page load or restoration from localStorage
+                $targetStep.addClass('doregister-step-active');
+            }
             
             // UPDATE PROGRESS BAR: Calculate and set width percentage
             // Formula: (current step / total steps) * 100
@@ -1146,10 +1177,11 @@
                     $('.doregister-image-preview').html('<img src="' + this.escapeHtml(this.formData.profile_photo) + '" alt="Preview" style="max-width: 200px; height: auto; margin-top: 10px;">');
                 }
                 
-                // RESTORE CURRENT STEP: Navigate to saved step
+                // RESTORE CURRENT STEP: Navigate to saved step without animation
                 // Allows user to continue from where they left off
+                // No animation needed on page load (instant restoration)
                 if (this.formData.currentStep) {
-                    this.goToStep(this.formData.currentStep);
+                    this.goToStep(this.formData.currentStep, true); // true = skip animation
                 }
             }
         },

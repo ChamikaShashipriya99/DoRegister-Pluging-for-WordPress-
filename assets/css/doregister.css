@@ -36,6 +36,7 @@
  * - padding: 30px - Internal spacing for content breathing room
  * - border-radius: 8px - Modern rounded corners (softens appearance)
  * - box-shadow - Subtle elevation effect (creates depth, separates from background)
+ * - overflow: hidden - Prevents horizontal scrolling during slide animations
  * 
  * Note: Profile wrapper overrides some of these values (see Profile section)
  */
@@ -48,6 +49,7 @@
     background: #fff; /* White background for contrast */
     border-radius: 8px; /* Rounded corners for modern appearance */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    overflow: hidden; /* Prevents horizontal scrolling during slide animations */
 }
 
 /* ==========================================================================
@@ -149,29 +151,52 @@
  * 
  * Design Intent:
  * - display: none - Completely removes from layout (not just hidden visually)
+ * - overflow: hidden - Prevents horizontal scrolling during slide animations
  * - This is the base state - overridden by .doregister-step-active
  */
 .doregister-step {
     display: none; /* Hidden by default (only one step visible at a time) */
+    overflow: hidden; /* Prevents horizontal scrolling during slide animations */
 }
 
 /**
  * Active Step State
  * 
  * Applied to the current step being displayed. Shows the step with a smooth
- * fade-in animation for better UX.
+ * slide animation for better UX.
  * 
  * Design Intent:
  * - display: block - Makes step visible and part of document flow
- * - fadeIn animation - Smooth entrance (0.3s) prevents jarring transitions
+ * - Slide animation - Smooth horizontal slide (0.4s) prevents jarring transitions
  * 
  * Interaction:
  * - JavaScript adds/removes this class when navigating between steps
  * - Animation plays each time step becomes active
+ * - Direction-based: slideInRight (forward) or slideInLeft (backward)
  */
 .doregister-step.doregister-step-active {
     display: block; /* Makes step visible */
-    animation: fadeIn 0.3s ease; /* Smooth fade-in animation */
+    animation: slideInRight 0.4s ease-out; /* Default: slide in from right */
+}
+
+/**
+ * Active Step - Sliding In From Left (Backward Navigation)
+ * 
+ * Applied when navigating backward (e.g., clicking "Back" button).
+ * Step slides in from the left side.
+ */
+.doregister-step.doregister-step-active.slide-in-left {
+    animation: slideInLeft 0.4s ease-out; /* Slide in from left */
+}
+
+/**
+ * Active Step - Sliding In From Right (Forward Navigation)
+ * 
+ * Applied when navigating forward (e.g., clicking "Next" button).
+ * Step slides in from the right side.
+ */
+.doregister-step.doregister-step-active.slide-in-right {
+    animation: slideInRight 0.4s ease-out; /* Slide in from right */
 }
 
 /**
@@ -188,28 +213,56 @@
 }
 
 /**
- * Fade-In Animation
+ * Slide In From Right Animation (Forward Navigation)
  * 
- * Keyframe animation for step transitions. Creates smooth entrance effect
- * by combining opacity and vertical translation.
+ * Keyframe animation for forward step transitions. Creates smooth slide effect
+ * by moving step from right to center.
  * 
  * Animation Flow:
- * - Starts: Invisible (opacity: 0) and slightly below (translateY(10px))
- * - Ends: Fully visible (opacity: 1) and in position (translateY(0))
+ * - Starts: Invisible (opacity: 0) and 100px to the right (translateX(100px))
+ * - Ends: Fully visible (opacity: 1) and in position (translateX(0))
  * 
  * Design Intent:
- * - Subtle movement (10px) - Draws attention without being distracting
+ * - Horizontal movement (100px) - Clear directional indication
  * - Opacity transition - Smooth visibility change
- * - 0.3s duration - Fast enough to feel responsive, slow enough to be smooth
+ * - 0.4s duration - Fast enough to feel responsive, slow enough to be smooth
+ * - ease-out timing - Starts fast, ends slow (natural feel)
  */
-@keyframes fadeIn {
+@keyframes slideInRight {
     from {
         opacity: 0; /* Starts invisible */
-        transform: translateY(10px); /* Starts 10px below final position */
+        transform: translateX(100px); /* Starts 100px to the right */
     }
     to {
         opacity: 1; /* Ends fully visible */
-        transform: translateY(0); /* Ends in final position */
+        transform: translateX(0); /* Ends in final position */
+    }
+}
+
+/**
+ * Slide In From Left Animation (Backward Navigation)
+ * 
+ * Keyframe animation for backward step transitions. Creates smooth slide effect
+ * by moving step from left to center.
+ * 
+ * Animation Flow:
+ * - Starts: Invisible (opacity: 0) and 100px to the left (translateX(-100px))
+ * - Ends: Fully visible (opacity: 1) and in position (translateX(0))
+ * 
+ * Design Intent:
+ * - Horizontal movement (100px) - Clear directional indication
+ * - Opacity transition - Smooth visibility change
+ * - 0.4s duration - Fast enough to feel responsive, slow enough to be smooth
+ * - ease-out timing - Starts fast, ends slow (natural feel)
+ */
+@keyframes slideInLeft {
+    from {
+        opacity: 0; /* Starts invisible */
+        transform: translateX(-100px); /* Starts 100px to the left */
+    }
+    to {
+        opacity: 1; /* Ends fully visible */
+        transform: translateX(0); /* Ends in final position */
     }
 }
 
