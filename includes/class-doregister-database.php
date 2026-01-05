@@ -419,6 +419,172 @@ class DoRegister_Database {
     }
     
     /**
+     * Update existing user in database
+     * 
+     * Updates user data in the custom table.
+     * Handles password hashing (if password is provided), data serialization, and NULL value conversion.
+     * 
+     * Process Flow:
+     * 1. Verify user exists
+     * 2. Set default values for missing fields (use existing data)
+     * 3. Hash password if provided (one-way encryption)
+     * 4. Serialize array data (interests) if provided
+     * 5. Convert empty strings to NULL for optional fields
+     * 6. Build format array for prepared statement
+     * 7. Update database record
+     * 8. Return true on success, false on failure
+     * 
+     * @since 1.0.0
+     * @param int $user_id User ID to update
+     * @param array $data User data array (full_name, email, password, etc.)
+     * @return bool True on success, false on failure
+     */
+    public static function update_user($user_id, $data) {
+        global $wpdb;
+        
+        // Safety check: Ensure table exists before updating
+        if (!self::table_exists()) {
+            error_log('DoRegister: Table does not exist for update');
+            return false;
+        }
+        
+        // Verify user exists before updating
+        $existing_user = self::get_user_by_id($user_id);
+        if (!$existing_user) {
+            error_log('DoRegister: User not found for update. ID: ' . $user_id);
+            return false;
+        }
+        
+        // Get table name (with prefix)
+        $table_name = self::get_table_name();
+        
+        // Start with existing user data as defaults
+        // This ensures we only update fields that are provided
+        $update_data = array(
+            'full_name' => $existing_user->full_name,
+            'email' => $existing_user->email,
+            'password' => $existing_user->password, // Keep existing password unless changed
+            'phone_number' => $existing_user->phone_number,
+            'country' => $existing_user->country,
+            'city' => $existing_user->city,
+            'gender' => $existing_user->gender,
+            'date_of_birth' => $existing_user->date_of_birth,
+            'interests' => $existing_user->interests, // Will be serialized if array
+            'profile_photo' => $existing_user->profile_photo
+        );
+        
+        // Merge provided data with existing data
+        // Only provided fields will be updated
+        if (isset($data['full_name'])) {
+            $update_data['full_name'] = sanitize_text_field($data['full_name']);
+        }
+        
+        if (isset($data['email'])) {
+            $update_data['email'] = sanitize_email($data['email']);
+        }
+        
+        if (isset($data['phone_number'])) {
+            $update_data['phone_number'] = sanitize_text_field($data['phone_number']);
+        }
+        
+        if (isset($data['country'])) {
+            $update_data['country'] = sanitize_text_field($data['country']);
+        }
+        
+        if (isset($data['city'])) {
+            $update_data['city'] = sanitize_text_field($data['city']);
+        }
+        
+        if (isset($data['gender'])) {
+            $update_data['gender'] = sanitize_text_field($data['gender']);
+        }
+        
+        if (isset($data['date_of_birth'])) {
+            $update_data['date_of_birth'] = sanitize_text_field($data['date_of_birth']);
+        }
+        
+        if (isset($data['profile_photo'])) {
+            $update_data['profile_photo'] = sanitize_text_field($data['profile_photo']);
+        }
+        
+        // PASSWORD HASHING: Only hash if new password is provided
+        // If password is provided, hash it; otherwise keep existing password
+        if (isset($data['password']) && !empty($data['password'])) {
+            // New password provided - hash it
+            $update_data['password'] = wp_hash_password($data['password']);
+        }
+        // If password is not provided or empty, keep existing password (already set above)
+        
+        // SERIALIZATION: Convert interests array to string if provided
+        if (isset($data['interests'])) {
+            if (is_array($data['interests'])) {
+                // Serialize array for database storage
+                $update_data['interests'] = serialize($data['interests']);
+            } elseif (!empty($data['interests'])) {
+                // Already a string, sanitize it
+                $update_data['interests'] = sanitize_text_field($data['interests']);
+            } else {
+                // Empty - set to NULL
+                $update_data['interests'] = null;
+            }
+        }
+        
+        // Convert empty strings to NULL for optional fields
+        // NULL is better than empty string for optional fields (cleaner database)
+        $final_data = array(
+            'full_name' => $update_data['full_name'], // Required field
+            'email' => $update_data['email'], // Required field
+            'password' => $update_data['password'], // Required field (hashed or existing)
+            'phone_number' => $update_data['phone_number'], // Required field
+            'country' => $update_data['country'], // Required field
+            'city' => !empty($update_data['city']) ? $update_data['city'] : null, // Optional: NULL if empty
+            'gender' => !empty($update_data['gender']) ? $update_data['gender'] : null, // Optional: NULL if empty
+            'date_of_birth' => !empty($update_data['date_of_birth']) ? $update_data['date_of_birth'] : null, // Optional: NULL if empty
+            'interests' => !empty($update_data['interests']) ? $update_data['interests'] : null, // Optional: NULL if empty (serialized string)
+            'profile_photo' => !empty($update_data['profile_photo']) ? $update_data['profile_photo'] : null // Optional: NULL if empty
+        );
+        
+        // Build format array for prepared statement
+        // $wpdb->update() requires format specifiers for each value
+        // '%s' = string, '%d' = integer, null = NULL value
+        $format = array();
+        foreach ($final_data as $value) {
+            // If value is NULL, format is null (no escaping needed)
+            // Otherwise, use '%s' (string format - WordPress will escape it)
+            $format[] = ($value === null) ? null : '%s';
+        }
+        
+        // Update user in database
+        // $wpdb->update() is WordPress's safe way to update data
+        // Parameters:
+        // 1. Table name
+        // 2. Data array (column => value)
+        // 3. Where clause (user ID)
+        // 4. Format array for data
+        // 5. Format array for where clause
+        // Returns: Number of rows affected (1 on success, false on failure)
+        $result = $wpdb->update(
+            $table_name, // Table to update
+            $final_data, // Data to update
+            array('id' => $user_id), // Where clause (user ID)
+            $format, // Format specifiers for data
+            array('%d') // Format specifier for where clause (integer)
+        );
+        
+        // Check if update failed
+        if ($result === false) {
+            // Log error for debugging
+            error_log('DoRegister Update Error: ' . $wpdb->last_error);
+            error_log('DoRegister Update Query: ' . $wpdb->last_query);
+            return false; // Return false on failure
+        }
+        
+        // Success - return true
+        // $result contains number of rows affected (should be 1)
+        return true;
+    }
+    
+    /**
      * Get user by email address
      * 
      * Retrieves a single user record from database by email.

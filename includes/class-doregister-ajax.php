@@ -90,6 +90,11 @@ class DoRegister_Ajax {
         // Called via AJAX when user leaves the email field (on blur event)
         add_action('wp_ajax_doregister_check_email', array($this, 'check_email_exists'));
         add_action('wp_ajax_nopriv_doregister_check_email', array($this, 'check_email_exists'));
+        
+        // Profile update AJAX handlers
+        // Handles profile editing from frontend
+        // Only for logged-in users (no nopriv needed - user must be logged in)
+        add_action('wp_ajax_doregister_update_profile', array($this, 'handle_profile_update'));
     }
     
     /**
@@ -604,6 +609,208 @@ class DoRegister_Ajax {
         // Return result as JSON
         // Frontend JavaScript uses this to show/hide error message
         wp_send_json_success(array('exists' => $exists));
+    }
+    
+    /**
+     * Handle profile update AJAX request
+     * 
+     * Processes profile editing form submission from frontend.
+     * Updates user data in database after validation and security checks.
+     * 
+     * Process Flow:
+     * 1. Verify nonce (security)
+     * 2. Verify user is logged in
+     * 3. Verify user can only update their own profile
+     * 4. Sanitize all input data
+     * 5. Validate all fields
+     * 6. Check email uniqueness (if email changed)
+     * 7. Update database
+     * 8. Return success/error response
+     * 
+     * Security:
+     * - Nonce verification prevents CSRF attacks
+     * - User verification prevents unauthorized updates
+     * - Input sanitization prevents XSS attacks
+     * - Server-side validation is authoritative
+     * 
+     * @since 1.0.0
+     * @return void (sends JSON response and exits)
+     */
+    public function handle_profile_update() {
+        // SECURITY: Verify nonce to prevent CSRF attacks
+        if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'doregister_profile_update')) {
+            wp_send_json_error(array('message' => 'Security check failed.'));
+        }
+        
+        // AUTHENTICATION: Verify user is logged in
+        // Ensure session is started
+        if (!session_id()) {
+            session_start();
+        }
+        
+        // Check session for logged-in user
+        if (!isset($_SESSION['doregister_user_id'])) {
+            // Also check persistent cookies (Remember Me)
+            if (!isset($_COOKIE['doregister_user_id']) || !isset($_COOKIE['doregister_user_token'])) {
+                wp_send_json_error(array('message' => 'You must be logged in to update your profile.'));
+            }
+            
+            // Verify cookie token
+            $cookie_user_id = intval($_COOKIE['doregister_user_id']);
+            $cookie_token = sanitize_text_field($_COOKIE['doregister_user_token']);
+            
+            if (!self::verify_auth_token($cookie_user_id, $cookie_token)) {
+                wp_send_json_error(array('message' => 'Authentication failed. Please login again.'));
+            }
+            
+            // Restore session from cookie
+            $_SESSION['doregister_user_id'] = $cookie_user_id;
+        }
+        
+        // Get logged-in user ID
+        $logged_in_user_id = intval($_SESSION['doregister_user_id']);
+        
+        // Get user ID from request (should match logged-in user)
+        $request_user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : $logged_in_user_id;
+        
+        // SECURITY: Verify user can only update their own profile
+        if ($request_user_id !== $logged_in_user_id) {
+            wp_send_json_error(array('message' => 'You can only update your own profile.'));
+        }
+        
+        // SANITIZATION: Clean all input data to prevent XSS attacks
+        $full_name = sanitize_text_field($_POST['full_name'] ?? '');
+        $email = sanitize_email($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? ''; // Password (NOT sanitized - needed for hashing)
+        $confirm_password = $_POST['confirm_password'] ?? '';
+        $phone_number = sanitize_text_field($_POST['phone_number'] ?? '');
+        $country = sanitize_text_field($_POST['country'] ?? '');
+        $city = sanitize_text_field($_POST['city'] ?? '');
+        $gender = sanitize_text_field($_POST['gender'] ?? '');
+        $date_of_birth = sanitize_text_field($_POST['date_of_birth'] ?? '');
+        // Interests is an array (checkboxes), so we map sanitize_text_field to each value
+        $interests = isset($_POST['interests']) ? array_map('sanitize_text_field', $_POST['interests']) : array();
+        $profile_photo = sanitize_text_field($_POST['profile_photo'] ?? '');
+        
+        // Initialize errors array to collect validation errors
+        $errors = array();
+        
+        // VALIDATION: Server-side validation (authoritative)
+        // Even though frontend validates, we MUST validate server-side for security
+        
+        // Validate full name: required field
+        if (empty($full_name)) {
+            $errors['full_name'] = 'Full name is required.';
+        }
+        
+        // Validate email: required, must be valid format
+        if (empty($email) || !is_email($email)) {
+            $errors['email'] = 'Valid email is required.';
+        } else {
+            // Check if email is being changed
+            $current_user = DoRegister_Database::get_user_by_id($logged_in_user_id);
+            if ($current_user && $current_user->email !== $email) {
+                // Email is being changed - check uniqueness
+                if (DoRegister_Database::email_exists($email)) {
+                    $errors['email'] = 'Email already exists.';
+                }
+            }
+        }
+        
+        // Validate password: only if password is being changed
+        if (!empty($password)) {
+            // Password is being changed - validate it
+            if (strlen($password) < 8) {
+                $errors['password'] = 'Password must be at least 8 characters.';
+            }
+            
+            // Validate password confirmation: must match password
+            if ($password !== $confirm_password) {
+                $errors['confirm_password'] = 'Passwords do not match.';
+            }
+        }
+        // If password is empty, user is not changing password (skip validation)
+        
+        // Validate phone number: required and must match pattern
+        if (empty($phone_number)) {
+            $errors['phone_number'] = 'Phone number is required.';
+        } elseif (!preg_match('/^[0-9+\-\s()]+$/', $phone_number)) {
+            $errors['phone_number'] = 'Invalid phone number format.';
+        }
+        
+        // Validate country: required field
+        if (empty($country)) {
+            $errors['country'] = 'Country is required.';
+        }
+        
+        // Validate interests: at least one must be selected
+        if (empty($interests) || count($interests) < 1) {
+            $errors['interests'] = 'Please select at least one interest.';
+        }
+        
+        // If validation errors exist, return them to frontend
+        if (!empty($errors)) {
+            wp_send_json_error(array('errors' => $errors, 'message' => 'Please fix the errors below.'));
+        }
+        
+        // Prepare user data array for database update
+        // Only include fields that should be updated
+        $user_data = array(
+            'full_name' => $full_name,
+            'email' => $email,
+            'phone_number' => $phone_number,
+            'country' => $country,
+            'city' => $city, // Optional field
+            'gender' => $gender, // Optional field
+            'date_of_birth' => $date_of_birth ? $date_of_birth : null, // Optional field
+            'interests' => $interests, // Array will be serialized in update_user() method
+            'profile_photo' => $profile_photo // Optional field
+        );
+        
+        // Only include password if it's being changed
+        if (!empty($password)) {
+            $user_data['password'] = $password; // Will be hashed in update_user() method
+        }
+        
+        // Update user in database
+        $updated = DoRegister_Database::update_user($logged_in_user_id, $user_data);
+        
+        // Check if update was successful
+        if ($updated) {
+            // Update successful - get updated user data
+            $updated_user = DoRegister_Database::get_user_by_id($logged_in_user_id);
+            
+            // Send success response with updated user data
+            wp_send_json_success(array(
+                'message' => 'Profile updated successfully!',
+                'user' => array(
+                    'id' => $updated_user->id,
+                    'full_name' => $updated_user->full_name,
+                    'email' => $updated_user->email,
+                    'phone_number' => $updated_user->phone_number,
+                    'country' => $updated_user->country,
+                    'city' => $updated_user->city,
+                    'gender' => $updated_user->gender,
+                    'date_of_birth' => $updated_user->date_of_birth,
+                    'interests' => $updated_user->interests,
+                    'profile_photo' => $updated_user->profile_photo
+                )
+            ));
+        } else {
+            // Update failed - get error details
+            global $wpdb;
+            
+            $error_message = 'Profile update failed. Please try again.';
+            
+            // Get database error if available (for debugging)
+            if (!empty($wpdb->last_error)) {
+                $error_message .= ' Error: ' . $wpdb->last_error;
+                error_log('DoRegister Update Error: ' . $wpdb->last_error);
+            }
+            
+            // Send error response to frontend
+            wp_send_json_error(array('message' => $error_message));
+        }
     }
 }
 

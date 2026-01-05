@@ -134,6 +134,10 @@ class DoRegister_Assets {
             // Different nonce for login (separate security context)
             'loginNonce' => wp_create_nonce('doregister_login'), // Creates unique token
             
+            // Security nonce for profile update
+            // Different nonce for profile editing (separate security context)
+            'profileUpdateNonce' => wp_create_nonce('doregister_profile_update'), // Creates unique token
+            
             // Country list for searchable dropdown
             // JavaScript uses this to populate country search functionality
             'countries' => $this->get_countries_list() // Array of country names
