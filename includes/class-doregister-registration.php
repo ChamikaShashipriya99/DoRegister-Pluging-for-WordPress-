@@ -141,9 +141,16 @@ class DoRegister_Registration {
                     <!-- Password Field -->
                     <div class="doregister-field-group">
                         <label for="password">Password <span class="required">*</span></label>
-                        <!-- type="password": Hides input characters -->
-                        <!-- JavaScript validates minimum length and strength -->
-                        <input type="password" id="password" name="password" class="doregister-input" required>
+                        <!-- Password Input Wrapper with Toggle Button -->
+                        <div class="doregister-password-wrapper">
+                            <!-- type="password": Hides input characters -->
+                            <!-- JavaScript validates minimum length and strength -->
+                            <input type="password" id="password" name="password" class="doregister-input doregister-password-input" required>
+                            <!-- Password Visibility Toggle Button -->
+                            <button type="button" class="doregister-password-toggle" aria-label="Show password">
+                                <span class="doregister-password-toggle-icon">👁️</span>
+                            </button>
+                        </div>
                         <!-- Password strength meter container (populated by JavaScript) -->
                         <div class="doregister-password-strength"></div>
                         <span class="doregister-error-message"></span>
@@ -152,8 +159,15 @@ class DoRegister_Registration {
                     <!-- Confirm Password Field -->
                     <div class="doregister-field-group">
                         <label for="confirm_password">Confirm Password <span class="required">*</span></label>
-                        <!-- JavaScript validates that this matches password field -->
-                        <input type="password" id="confirm_password" name="confirm_password" class="doregister-input" required>
+                        <!-- Confirm Password Input Wrapper with Toggle Button -->
+                        <div class="doregister-password-wrapper">
+                            <!-- JavaScript validates that this matches password field -->
+                            <input type="password" id="confirm_password" name="confirm_password" class="doregister-input doregister-password-input" required>
+                            <!-- Password Visibility Toggle Button -->
+                            <button type="button" class="doregister-password-toggle" aria-label="Show password">
+                                <span class="doregister-password-toggle-icon">👁️</span>
+                            </button>
+                        </div>
                         <span class="doregister-error-message"></span>
                     </div>
                     

@@ -142,6 +142,58 @@
             // Populates fields with previously entered values (if page was refreshed)
             this.restoreFormData();
             
+            // PASSWORD VISIBILITY TOGGLE: Show/hide password functionality
+            // Handles clicks on password toggle buttons
+            $(document).on('click', '.doregister-password-toggle', function(e) {
+                // Prevent default button behavior and stop event propagation
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Get the toggle button
+                var $toggle = $(this);
+                
+                // Find the associated password input within the same wrapper
+                // The input and button are siblings within .doregister-password-wrapper
+                var $wrapper = $toggle.closest('.doregister-password-wrapper');
+                
+                // Find the input field - it should be a direct child of the wrapper
+                var $input = $wrapper.find('input[type="password"], input[type="text"]').first();
+                
+                // Alternative: try finding by class
+                if ($input.length === 0) {
+                    $input = $wrapper.find('.doregister-password-input');
+                }
+                
+                // Check if input was found
+                if ($input.length === 0) {
+                    console.error('Password input not found for toggle button');
+                    return false;
+                }
+                
+                // Get current input type
+                var currentType = $input.attr('type') || 'password';
+                
+                // Toggle password visibility
+                if (currentType === 'password') {
+                    // Show password: Change input type to text
+                    $input.attr('type', 'text');
+                    $toggle.addClass('active');
+                    // Update icon to "hide" icon
+                    $toggle.find('.doregister-password-toggle-icon').text('🙈');
+                    $toggle.attr('aria-label', 'Hide password');
+                } else {
+                    // Hide password: Change input type back to password
+                    $input.attr('type', 'password');
+                    $toggle.removeClass('active');
+                    // Update icon to "show" icon
+                    $toggle.find('.doregister-password-toggle-icon').text('👁️');
+                    $toggle.attr('aria-label', 'Show password');
+                }
+                
+                // Return false to prevent any further event handling
+                return false;
+            });
+            
             // NEXT BUTTON HANDLER: Navigate to next step
             // Event delegation: Works even if button is added dynamically
             // $(document).on() attaches handler to document, listens for clicks on matching elements

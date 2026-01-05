@@ -426,6 +426,125 @@
 }
 
 /* ==========================================================================
+   COMPONENTS: Password Visibility Toggle
+   ========================================================================== */
+
+/**
+ * Password Input Wrapper
+ * 
+ * Container for password input and toggle button.
+ * Uses relative positioning to position toggle button absolutely.
+ * 
+ * Design Intent:
+ * - position: relative - Creates positioning context for absolute toggle button
+ * - display: flex - Allows input and button to be side-by-side
+ */
+.doregister-password-wrapper {
+    position: relative; /* Positioning context for absolute toggle button */
+    display: flex; /* Flexbox layout for input and button */
+    align-items: center; /* Vertically centers input and button */
+}
+
+/**
+ * Password Input (with Toggle)
+ * 
+ * Password input field with padding on right side for toggle button.
+ * 
+ * Design Intent:
+ * - padding-right: 45px - Space for toggle button on the right
+ * - Maintains all other input styling
+ */
+.doregister-password-input {
+    padding-right: 45px; /* Space for toggle button on the right */
+}
+
+/**
+ * Password Toggle Button
+ * 
+ * Button to toggle password visibility (show/hide).
+ * Positioned absolutely on the right side of password input.
+ * 
+ * Design Intent:
+ * - position: absolute - Positioned relative to wrapper
+ * - right: 10px - 10px from right edge
+ * - background: transparent - No background (clean appearance)
+ * - border: none - No border
+ * - cursor: pointer - Indicates clickability
+ * - padding: 8px - Comfortable click target
+ * - z-index: 1 - Appears above input
+ */
+.doregister-password-toggle {
+    position: absolute; /* Positioned relative to wrapper */
+    right: 10px; /* 10px from right edge */
+    background: transparent; /* No background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    padding: 8px; /* Comfortable click target */
+    z-index: 10; /* Appears above input (higher z-index) */
+    display: flex; /* Flexbox for icon centering */
+    align-items: center; /* Vertically centers icon */
+    justify-content: center; /* Horizontally centers icon */
+    transition: opacity 0.2s ease; /* Smooth opacity change on hover */
+    pointer-events: auto; /* Ensures button is clickable */
+    min-width: 32px; /* Minimum clickable area */
+    min-height: 32px; /* Minimum clickable area */
+}
+
+/**
+ * Password Toggle Button Hover State
+ * 
+ * Slight opacity change on hover for visual feedback.
+ */
+.doregister-password-toggle:hover {
+    opacity: 0.7; /* Slightly transparent on hover */
+}
+
+/**
+ * Password Toggle Button Active State
+ * 
+ * Visual feedback when button is clicked.
+ */
+.doregister-password-toggle:active {
+    opacity: 0.5; /* More transparent when clicked */
+}
+
+/**
+ * Password Toggle Icon
+ * 
+ * Icon/text displayed in toggle button.
+ * 
+ * Design Intent:
+ * - font-size: 18px - Readable icon size
+ * - user-select: none - Prevents text selection
+ * - line-height: 1 - Prevents extra spacing
+ */
+.doregister-password-toggle-icon {
+    font-size: 18px; /* Readable icon size */
+    user-select: none; /* Prevents text selection */
+    line-height: 1; /* Prevents extra spacing */
+    display: inline-block; /* Allows proper sizing */
+}
+
+/**
+ * Password Toggle - Active State (Password Visible)
+ * 
+ * When password is visible, button has active state.
+ * Icon change is handled via JavaScript.
+ */
+.doregister-password-toggle.active {
+    opacity: 0.8; /* Slightly different appearance when active */
+}
+
+/**
+ * Password Input Focus with Toggle
+ * 
+ * Ensures toggle button remains visible when input is focused.
+ */
+.doregister-password-input:focus {
+    padding-right: 45px; /* Maintain space for toggle button */
+}
+
+/* ==========================================================================
    COMPONENTS: Error Messages
    ========================================================================== */
 
