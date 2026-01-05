@@ -1829,9 +1829,12 @@
 
 .doregister-profile-actions {
     margin-top: 40px;
-    text-align: center;
     padding-top: 30px;
     border-top: 2px solid #e9ecef;
+    display: flex; /* Flexbox for side-by-side buttons */
+    justify-content: center; /* Center buttons */
+    gap: 15px; /* Spacing between buttons */
+    flex-wrap: wrap; /* Wrap on smaller screens */
 }
 
 .doregister-profile-actions .doregister-btn-logout {
@@ -1845,6 +1848,180 @@
 .doregister-profile-actions .doregister-btn-logout:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+.doregister-profile-actions .doregister-btn-edit {
+    padding: 14px 40px;
+    font-size: 16px;
+    border-radius: 50px;
+    background: #4CAF50; /* Green color for edit button */
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.doregister-profile-actions .doregister-btn-edit:hover {
+    background: #45a049; /* Darker green on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* ==========================================================================
+   COMPONENTS: Profile Edit Mode
+   ========================================================================== */
+
+
+/**
+ * Profile View Mode
+ * 
+ * Container for read-only profile display.
+ * Shown when not in edit mode.
+ */
+.doregister-profile-view-mode {
+    display: block; /* Visible by default */
+}
+
+/**
+ * Profile Edit Mode
+ * 
+ * Container for editable profile form.
+ * Hidden by default, shown when edit mode is active.
+ */
+.doregister-profile-edit-mode {
+    display: none; /* Hidden by default */
+}
+
+/**
+ * Profile Edit Mode - Active State
+ * 
+ * When edit mode is active, show edit form and hide view.
+ */
+.doregister-profile-wrapper.edit-mode .doregister-profile-view-mode {
+    display: none; /* Hide view mode */
+}
+
+.doregister-profile-wrapper.edit-mode .doregister-profile-edit-mode {
+    display: block; /* Show edit mode */
+}
+
+/**
+ * Profile Edit Actions Container
+ * 
+ * Container for Save and Cancel buttons in edit mode.
+ * Flexbox layout for horizontal arrangement.
+ * 
+ * Design Intent:
+ * - display: flex - Horizontal button layout
+ * - justify-content: space-between - Cancel left, Save right
+ * - gap: 15px - Spacing between buttons
+ * - margin-top: 30px - Spacing from form content
+ */
+.doregister-profile-edit-actions {
+    display: flex; /* Flexbox for horizontal layout */
+    justify-content: space-between; /* Cancel left, Save right */
+    gap: 15px; /* Spacing between buttons */
+    margin-top: 30px; /* Spacing from form content */
+}
+
+/**
+ * Save Changes Button
+ * 
+ * Primary action button for saving profile updates.
+ * Green color indicates positive action.
+ */
+.doregister-btn-save {
+    background: #4CAF50; /* Primary green color */
+    color: #fff; /* White text */
+    padding: 12px 30px; /* Comfortable click target */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    font-weight: 600; /* Semi-bold for emphasis */
+    cursor: pointer; /* Pointer cursor */
+    transition: all 0.3s ease; /* Smooth animation */
+    margin-left: auto; /* Pushes to right side */
+}
+
+/**
+ * Save Button Hover State
+ */
+.doregister-btn-save:hover {
+    background: #45a049; /* Darker green on hover */
+    transform: translateY(-2px); /* Slight upward movement */
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3); /* Green shadow */
+}
+
+/**
+ * Cancel Button
+ * 
+ * Secondary action button for canceling edit mode.
+ * Gray color indicates secondary action.
+ */
+.doregister-btn-cancel {
+    background: #757575; /* Gray (secondary action) */
+    color: #fff; /* White text */
+    padding: 12px 30px; /* Comfortable click target */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    font-weight: 600; /* Semi-bold for emphasis */
+    cursor: pointer; /* Pointer cursor */
+    transition: all 0.3s ease; /* Smooth animation */
+}
+
+/**
+ * Cancel Button Hover State
+ */
+.doregister-btn-cancel:hover {
+    background: #616161; /* Darker gray on hover */
+}
+
+/**
+ * Profile Edit Form
+ * 
+ * Form styling for profile edit mode.
+ * Matches registration form styling for consistency.
+ */
+.doregister-profile-edit-mode .doregister-form {
+    margin: 0; /* No margin (container handles spacing) */
+}
+
+/**
+ * Profile Edit Form Field Groups
+ * 
+ * Field group styling within profile edit form.
+ * Reuses registration form field group styles.
+ */
+.doregister-profile-edit-mode .doregister-field-group {
+    margin-bottom: 20px; /* Consistent spacing */
+}
+
+/**
+ * Profile Edit Form Inputs
+ * 
+ * Input field styling within profile edit form.
+ * Reuses registration form input styles.
+ */
+.doregister-profile-edit-mode .doregister-input {
+    width: 100%; /* Full width */
+    padding: 12px 15px; /* Comfortable padding */
+    border: 2px solid #ddd; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    transition: border-color 0.3s ease; /* Smooth border transition */
+    box-sizing: border-box; /* Includes padding/border in width */
+}
+
+.doregister-profile-edit-mode .doregister-input:focus {
+    outline: none; /* Removes default browser outline */
+    border-color: #4CAF50; /* Green border on focus */
+}
+
+.doregister-profile-edit-mode .doregister-input.doregister-input-error {
+    border-color: #e74c3c; /* Red border for error state */
 }
 
 /* ==========================================================================

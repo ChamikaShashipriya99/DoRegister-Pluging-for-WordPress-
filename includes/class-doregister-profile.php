@@ -147,7 +147,7 @@ class DoRegister_Profile {
         ob_start();
         ?>
         <!-- Profile Page Wrapper -->
-        <div class="doregister-profile-wrapper">
+        <div class="doregister-profile-wrapper" data-user-id="<?php echo esc_attr($user_id); ?>">
             <!-- Page Title -->
             <h2>My Profile</h2>
             
@@ -182,24 +182,62 @@ class DoRegister_Profile {
             <!-- Profile Content: Categorized User Data -->
             <!-- Categories match registration form steps for consistency -->
             <div class="doregister-profile-content">
-                <!-- Category 1: Basic Information (Step 1 from registration) -->
-                <div class="doregister-profile-category">
-                    <h3 class="doregister-profile-category-title">Basic Information</h3>
-                    <div class="doregister-profile-category-content">
-                        <!-- Full Name Field -->
-                        <div class="doregister-profile-field">
-                            <strong>Full Name</strong>
-                            <span><?php echo esc_html($user->full_name); ?></span>
-                        </div>
-                        <!-- Email Field -->
-                        <div class="doregister-profile-field">
-                            <strong>Email</strong>
-                            <span><?php echo esc_html($user->email); ?></span>
+                
+                <!-- VIEW MODE: Basic Information (Read-Only) -->
+                <div class="doregister-profile-view-mode">
+                    <!-- Category 1: Basic Information (Step 1 from registration) -->
+                    <div class="doregister-profile-category">
+                        <h3 class="doregister-profile-category-title">Basic Information</h3>
+                        <div class="doregister-profile-category-content">
+                            <!-- Full Name Field -->
+                            <div class="doregister-profile-field">
+                                <strong>Full Name</strong>
+                                <span><?php echo esc_html($user->full_name); ?></span>
+                            </div>
+                            <!-- Email Field -->
+                            <div class="doregister-profile-field">
+                                <strong>Email</strong>
+                                <span><?php echo esc_html($user->email); ?></span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Category 2: Contact Details (Step 2 from registration) -->
+                <!-- EDIT MODE: Basic Information Form (Editable) -->
+                <div class="doregister-profile-edit-mode" style="display: none;">
+                    <!-- Profile Edit Form -->
+                    <form id="doregister-profile-edit-form" class="doregister-form">
+                        <!-- Security Nonce Field -->
+                        <?php wp_nonce_field('doregister_profile_update', 'doregister_profile_update_nonce'); ?>
+                        
+                        <!-- Hidden User ID Field -->
+                        <input type="hidden" name="user_id" value="<?php echo esc_attr($user_id); ?>">
+                        
+                        <!-- Category 1: Basic Information (Editable) -->
+                        <div class="doregister-profile-category">
+                            <h3 class="doregister-profile-category-title">Basic Information</h3>
+                            <div class="doregister-profile-category-content">
+                                <!-- Full Name Field (Editable) -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_full_name">Full Name <span class="required">*</span></label>
+                                    <input type="text" id="profile_full_name" name="full_name" class="doregister-input" value="<?php echo esc_attr($user->full_name); ?>" required>
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                                
+                                <!-- Email Field (Editable) -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_email">Email <span class="required">*</span></label>
+                                    <input type="email" id="profile_email" name="email" class="doregister-input" value="<?php echo esc_attr($user->email); ?>" required>
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- VIEW MODE: Contact Details (Read-Only) -->
+                <div class="doregister-profile-view-mode">
+                    <!-- Category 2: Contact Details (Step 2 from registration) -->
                 <div class="doregister-profile-category">
                     <h3 class="doregister-profile-category-title">Contact Details</h3>
                     <div class="doregister-profile-category-content">
@@ -222,8 +260,11 @@ class DoRegister_Profile {
                         <?php endif; ?>
                     </div>
                 </div>
+                </div>
                 
-                <!-- Category 3: Personal Details (Step 3 from registration) -->
+                <!-- VIEW MODE: Personal Details (Read-Only) -->
+                <div class="doregister-profile-view-mode">
+                    <!-- Category 3: Personal Details (Step 3 from registration) -->
                 <div class="doregister-profile-category">
                     <h3 class="doregister-profile-category-title">Personal Details</h3>
                     <div class="doregister-profile-category-content">
@@ -264,8 +305,11 @@ class DoRegister_Profile {
                         <?php endif; ?>
                     </div>
                 </div>
+                </div>
                 
-                <!-- Category 4: Profile Media (Step 4 from registration) -->
+                <!-- VIEW MODE: Profile Media (Read-Only) -->
+                <div class="doregister-profile-view-mode">
+                    <!-- Category 4: Profile Media (Step 4 from registration) -->
                 <div class="doregister-profile-category">
                     <h3 class="doregister-profile-category-title">Profile Media</h3>
                     <div class="doregister-profile-category-content">
@@ -283,8 +327,11 @@ class DoRegister_Profile {
                         </div>
                     </div>
                 </div>
+                </div>
                 
-                <!-- Category 5: Account Information (additional info) -->
+                <!-- VIEW MODE: Account Information (Read-Only) -->
+                <div class="doregister-profile-view-mode">
+                    <!-- Category 5: Account Information (additional info) -->
                 <div class="doregister-profile-category">
                     <h3 class="doregister-profile-category-title">Account Information</h3>
                     <div class="doregister-profile-category-content">
@@ -296,14 +343,29 @@ class DoRegister_Profile {
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
             
-            <!-- Profile Actions: Logout Button -->
-            <div class="doregister-profile-actions">
+            <!-- Profile Actions: Edit & Logout Buttons (View Mode) -->
+            <div class="doregister-profile-actions doregister-profile-view-mode">
+                <!-- Edit Profile Button -->
+                <button type="button" class="doregister-btn doregister-btn-edit">Edit Profile</button>
                 <!-- Logout Button -->
                 <!-- type="button": Doesn't submit form (just triggers JavaScript) -->
                 <!-- class="doregister-btn-logout": JavaScript uses this to handle logout -->
                 <button type="button" class="doregister-btn doregister-btn-logout">Logout</button>
+            </div>
+            
+            <!-- Profile Actions: Save & Cancel Buttons (Edit Mode) -->
+            <div class="doregister-profile-actions doregister-profile-edit-mode" style="display: none;">
+                <!-- Form Messages Container -->
+                <div class="doregister-form-messages"></div>
+                
+                <!-- Save and Cancel Buttons -->
+                <div class="doregister-profile-edit-actions">
+                    <button type="button" class="doregister-btn doregister-btn-cancel">Cancel</button>
+                    <button type="submit" class="doregister-btn doregister-btn-save">Save Changes</button>
+                </div>
             </div>
         </div>
         <?php

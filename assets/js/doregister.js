@@ -110,6 +110,10 @@
             // Set up logout button handler
             // Handles: logout AJAX request
             this.initLogout();
+            
+            // Set up profile edit mode functionality
+            // Handles: edit button, cancel button, form submission
+            this.initProfileEdit();
         },
         
         /**
@@ -539,6 +543,204 @@
                 // Call logout handler (makes AJAX request and redirects)
                 self.handleLogout();
             });
+        },
+        
+        /**
+         * Initialize Profile Edit Mode functionality
+         * 
+         * Handles:
+         * - Edit button click (enters edit mode)
+         * - Cancel button click (exits edit mode)
+         * - Form submission (saves profile changes)
+         * 
+         * @method initProfileEdit
+         * @returns {void}
+         */
+        initProfileEdit: function() {
+            var self = this;
+            var $wrapper = $('.doregister-profile-wrapper');
+            
+            // Only initialize if profile wrapper exists (on profile page)
+            if ($wrapper.length === 0) {
+                return;
+            }
+            
+            // EDIT BUTTON: Enter edit mode
+            $(document).on('click', '.doregister-btn-edit', function(e) {
+                e.preventDefault();
+                
+                // Add edit-mode class to wrapper (triggers CSS to show/hide elements)
+                $wrapper.addClass('edit-mode');
+                
+                // Focus on first input field for better UX
+                $('#profile_full_name').focus();
+            });
+            
+            // CANCEL BUTTON: Exit edit mode
+            $(document).on('click', '.doregister-btn-cancel', function(e) {
+                e.preventDefault();
+                
+                // Remove edit-mode class (triggers CSS to show/hide elements)
+                $wrapper.removeClass('edit-mode');
+                
+                // Clear any error messages
+                self.clearProfileFormErrors();
+                
+                // Reset form to original values (optional - could restore from data attributes)
+                // For now, just exit edit mode
+            });
+            
+            // FORM SUBMISSION: Handle profile update
+            $(document).on('submit', '#doregister-profile-edit-form', function(e) {
+                e.preventDefault();
+                
+                // Call profile update handler
+                self.handleProfileUpdate();
+            });
+        },
+        
+        /**
+         * Handle Profile Update Submission
+         * 
+         * Validates form data and submits via AJAX.
+         * Shows success/error messages and handles response.
+         * 
+         * @method handleProfileUpdate
+         * @returns {void}
+         */
+        handleProfileUpdate: function() {
+            var self = this;
+            var $form = $('#doregister-profile-edit-form');
+            var $messages = $('.doregister-form-messages');
+            
+            // Clear previous errors
+            self.clearProfileFormErrors();
+            $messages.empty().removeClass('doregister-success doregister-error');
+            
+            // Get form data
+            var formData = {
+                action: 'doregister_update_profile',
+                nonce: doregisterData.profileUpdateNonce,
+                full_name: $('#profile_full_name').val().trim(),
+                email: $('#profile_email').val().trim()
+            };
+            
+            // Basic frontend validation
+            var errors = {};
+            
+            if (!formData.full_name) {
+                errors.full_name = 'Full name is required.';
+            }
+            
+            if (!formData.email) {
+                errors.email = 'Email is required.';
+            } else if (!self.isValidEmail(formData.email)) {
+                errors.email = 'Please enter a valid email address.';
+            }
+            
+            // Display errors if any
+            if (Object.keys(errors).length > 0) {
+                self.displayProfileFormErrors(errors);
+                return;
+            }
+            
+            // Disable submit button during request
+            var $submitBtn = $('.doregister-btn-save');
+            $submitBtn.prop('disabled', true).text('Saving...');
+            
+            // AJAX Request
+            $.ajax({
+                url: doregisterData.ajaxUrl,
+                type: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success) {
+                        // SUCCESS: Show success message
+                        $messages.html('<div class="doregister-message doregister-success">' + 
+                            self.escapeHtml(response.data.message || 'Profile updated successfully!') + 
+                            '</div>').addClass('doregister-success');
+                        
+                        // Exit edit mode after short delay
+                        setTimeout(function() {
+                            $('.doregister-profile-wrapper').removeClass('edit-mode');
+                            // Reload page to show updated data (or update DOM dynamically)
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        // ERROR: Show error message and field errors
+                        $messages.html('<div class="doregister-message doregister-error">' + 
+                            self.escapeHtml(response.data.message || 'Failed to update profile.') + 
+                            '</div>').addClass('doregister-error');
+                        
+                        // Display field-specific errors if provided
+                        if (response.data.errors) {
+                            self.displayProfileFormErrors(response.data.errors);
+                        }
+                        
+                        // Re-enable submit button
+                        $submitBtn.prop('disabled', false).text('Save Changes');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    // AJAX ERROR: Show generic error message
+                    $messages.html('<div class="doregister-message doregister-error">' + 
+                        'An error occurred. Please try again.' + 
+                        '</div>').addClass('doregister-error');
+                    
+                    // Re-enable submit button
+                    $submitBtn.prop('disabled', false).text('Save Changes');
+                    
+                    console.error('Profile update error:', error);
+                }
+            });
+        },
+        
+        /**
+         * Display Profile Form Errors
+         * 
+         * Shows error messages next to corresponding form fields.
+         * 
+         * @method displayProfileFormErrors
+         * @param {Object} errors - Object with field names as keys and error messages as values
+         * @returns {void}
+         */
+        displayProfileFormErrors: function(errors) {
+            // Map field names to input IDs
+            var fieldMap = {
+                'full_name': '#profile_full_name',
+                'email': '#profile_email'
+            };
+            
+            // Display error for each field
+            for (var field in errors) {
+                if (errors.hasOwnProperty(field) && fieldMap[field]) {
+                    var $field = $(fieldMap[field]);
+                    var $errorMsg = $field.siblings('.doregister-error-message');
+                    
+                    // Add error class to input
+                    $field.addClass('doregister-input-error');
+                    
+                    // Display error message
+                    $errorMsg.text(errors[field]).show();
+                }
+            }
+        },
+        
+        /**
+         * Clear Profile Form Errors
+         * 
+         * Removes error styling and messages from all form fields.
+         * 
+         * @method clearProfileFormErrors
+         * @returns {void}
+         */
+        clearProfileFormErrors: function() {
+            // Remove error class from all inputs
+            $('#doregister-profile-edit-form .doregister-input').removeClass('doregister-input-error');
+            
+            // Clear all error messages
+            $('#doregister-profile-edit-form .doregister-error-message').text('').hide();
         },
         
         /**
