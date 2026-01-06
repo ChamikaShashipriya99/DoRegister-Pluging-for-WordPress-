@@ -548,8 +548,15 @@
                 // Prevent default button behavior
                 e.preventDefault();
                 
-                // Call logout handler (makes AJAX request and redirects)
-                self.handleLogout();
+                // Show confirmation dialog before logging out
+                var confirmLogout = confirm('Are you sure you want to logout?');
+                
+                // Only proceed with logout if user confirms
+                if (confirmLogout) {
+                    // Call logout handler (makes AJAX request and redirects)
+                    self.handleLogout();
+                }
+                // If user cancels, do nothing (stay on page)
             });
         },
         
