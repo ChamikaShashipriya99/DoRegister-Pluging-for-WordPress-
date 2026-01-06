@@ -1184,6 +1184,116 @@
     border: 1px solid #f5c6cb; /* Red border */
 }
 
+/**
+ * Info Message
+ * 
+ * Styles informational messages (e.g., "You are already logged in").
+ * Uses blue color scheme for informational feedback.
+ * 
+ * Design Intent:
+ * - Light blue background (#d1ecf1) - Subtle, informative appearance
+ * - Dark blue text (#0c5460) - High contrast for readability
+ * - Blue border (#bee5eb) - Defines message boundaries
+ * - Enhanced with icon support and button-style links
+ */
+.doregister-message.doregister-info {
+    background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%); /* Gradient background */
+    color: #0c5460; /* Dark blue text (high contrast) */
+    border: 2px solid #17a2b8; /* Stronger blue border */
+    border-left: 5px solid #17a2b8; /* Left accent border */
+    padding: 20px 25px; /* More generous padding */
+    box-shadow: 0 2px 8px rgba(23, 162, 184, 0.15); /* Subtle shadow */
+    position: relative; /* For icon positioning */
+    display: flex; /* Flexbox for layout */
+    align-items: center; /* Vertical alignment */
+    gap: 12px; /* Space between icon and content */
+    font-size: 15px; /* Slightly larger text */
+    line-height: 1.6; /* Better line spacing */
+    font-weight: 400; /* Regular weight */
+}
+
+/* Info icon (using CSS pseudo-element) */
+.doregister-message.doregister-info::before {
+    content: "ℹ️"; /* Info icon emoji */
+    font-size: 24px; /* Icon size */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+    line-height: 1; /* Remove extra line height */
+}
+
+/* Links within info message - styled as buttons */
+.doregister-message.doregister-info a {
+    display: inline-block; /* Block-level for padding */
+    color: #ffffff; /* White text */
+    background: #17a2b8; /* Blue background */
+    padding: 8px 16px; /* Button padding */
+    border-radius: 4px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    font-weight: 500; /* Medium weight */
+    font-size: 14px; /* Slightly smaller than message text */
+    margin-left: 8px; /* Space from previous text */
+    transition: all 0.3s ease; /* Smooth transitions */
+    border: 1px solid #138496; /* Border for definition */
+    box-shadow: 0 2px 4px rgba(23, 162, 184, 0.2); /* Subtle shadow */
+}
+
+/* Profile link specific styling */
+.doregister-message.doregister-info .doregister-link-to-profile {
+    background: #28a745; /* Green for primary action */
+    border-color: #218838; /* Darker green border */
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2); /* Green shadow */
+}
+
+/* Logout link specific styling */
+.doregister-message.doregister-info .doregister-btn-logout {
+    background: #dc3545; /* Red for logout action */
+    border-color: #c82333; /* Darker red border */
+    box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2); /* Red shadow */
+    cursor: pointer; /* Pointer cursor */
+}
+
+/* Hover states for links */
+.doregister-message.doregister-info a:hover {
+    transform: translateY(-2px); /* Slight lift on hover */
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3); /* Enhanced shadow */
+    text-decoration: none; /* No underline */
+}
+
+.doregister-message.doregister-info .doregister-link-to-profile:hover {
+    background: #218838; /* Darker green on hover */
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3); /* Green shadow */
+}
+
+.doregister-message.doregister-info .doregister-btn-logout:hover {
+    background: #c82333; /* Darker red on hover */
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3); /* Red shadow */
+}
+
+/* Active state for links */
+.doregister-message.doregister-info a:active {
+    transform: translateY(0); /* Reset transform */
+    box-shadow: 0 1px 3px rgba(23, 162, 184, 0.2); /* Reduced shadow */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .doregister-message.doregister-info {
+        flex-direction: column; /* Stack icon and content on mobile */
+        align-items: flex-start; /* Left align */
+        padding: 15px 20px; /* Slightly less padding on mobile */
+    }
+    
+    .doregister-message.doregister-info::before {
+        margin-bottom: 8px; /* Space below icon */
+    }
+    
+    .doregister-message.doregister-info a {
+        display: block; /* Full width buttons on mobile */
+        width: 100%; /* Full width */
+        text-align: center; /* Centered text */
+        margin: 8px 0 0 0; /* Vertical spacing */
+    }
+}
+
 /* ==========================================================================
    COMPONENTS: Form Footer (Navigation Links)
    ========================================================================== */

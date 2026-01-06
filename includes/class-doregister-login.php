@@ -71,6 +71,55 @@ class DoRegister_Login {
     }
     
     /**
+     * Check if user is currently logged in
+     * 
+     * Checks both session and persistent cookies (Remember Me) to determine
+     * if user is authenticated.
+     * 
+     * @since 1.0.0
+     * @return int|null User ID if logged in, null otherwise
+     */
+    private function is_user_logged_in() {
+        // Ensure session is started
+        if (!session_id()) {
+            session_start();
+        }
+        
+        $user_id = null;
+        
+        // Check session (standard login)
+        if (isset($_SESSION['doregister_user_id'])) {
+            $user_id = intval($_SESSION['doregister_user_id']);
+        }
+        // Check persistent cookies (Remember Me login)
+        elseif (isset($_COOKIE['doregister_user_id']) && isset($_COOKIE['doregister_user_token'])) {
+            $cookie_user_id = intval($_COOKIE['doregister_user_id']);
+            $cookie_token = sanitize_text_field($_COOKIE['doregister_user_token']);
+            
+            // Verify token is valid
+            if (class_exists('DoRegister_Ajax') && DoRegister_Ajax::verify_auth_token($cookie_user_id, $cookie_token)) {
+                // Token is valid - restore session from cookie
+                $user_id = $cookie_user_id;
+                $_SESSION['doregister_user_id'] = $user_id;
+                
+                // Get user email for session
+                if (class_exists('DoRegister_Database')) {
+                    $user = DoRegister_Database::get_user_by_id($user_id);
+                    if ($user) {
+                        $_SESSION['doregister_user_email'] = $user->email;
+                    }
+                }
+            } else {
+                // Invalid token - clear cookies
+                setcookie('doregister_user_id', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+                setcookie('doregister_user_token', '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
+            }
+        }
+        
+        return $user_id;
+    }
+    
+    /**
      * Render login form HTML
      * 
      * Generates the HTML markup for the login form.
@@ -92,6 +141,15 @@ class DoRegister_Login {
      * @return string HTML markup for login form
      */
     public function render_login_form() {
+        // Check if user is already logged in
+        $user_id = $this->is_user_logged_in();
+        
+        if ($user_id) {
+            // User is already logged in - show message instead of form
+            $profile_url = home_url('/profile');
+            return '<div class="doregister-message doregister-info">You are already logged in. <a href="' . esc_url($profile_url) . '" class="doregister-link-to-profile">Go to your profile</a> or <a href="#" class="doregister-btn-logout">logout</a>.</div>';
+        }
+        
         // Start output buffering - capture all HTML output
         ob_start();
         ?>
