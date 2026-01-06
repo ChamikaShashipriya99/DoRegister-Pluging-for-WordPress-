@@ -118,6 +118,10 @@
             // Set up profile edit form features
             // Handles: password toggle, photo upload, country dropdown
             this.initProfileEditFeatures();
+            
+            // Set up profile edit form validation
+            // Handles: real-time validation on blur, password strength, etc.
+            this.initProfileEditValidation();
         },
         
         /**
@@ -580,6 +584,9 @@
                 $('.doregister-profile-edit-mode').show();
                 $('.doregister-profile-view-mode').hide();
                 
+                // Populate form with current data (ensure all fields are filled)
+                self.populateProfileEditForm();
+                
                 // Focus on first input field for better UX
                 $('#profile_full_name').focus();
             });
@@ -602,9 +609,19 @@
                 // For now, just exit edit mode
             });
             
-            // FORM SUBMISSION: Handle profile update
+            // FORM SUBMISSION: Handle profile update (form submit event)
             $(document).on('submit', '#doregister-profile-edit-form', function(e) {
                 e.preventDefault();
+                
+                // Call profile update handler
+                self.handleProfileUpdate();
+            });
+            
+            // SAVE BUTTON CLICK: Handle save button click (in case button is outside form)
+            $(document).on('click', '.doregister-btn-save', function(e) {
+                e.preventDefault();
+                
+                console.log('DoRegister: Save button clicked');
                 
                 // Call profile update handler
                 self.handleProfileUpdate();
@@ -624,6 +641,18 @@
             var self = this;
             var $form = $('#doregister-profile-edit-form');
             var $messages = $('.doregister-form-messages');
+            
+            // Debug: Check if form exists
+            if ($form.length === 0) {
+                console.error('DoRegister: Profile edit form not found');
+                return;
+            }
+            
+            // Debug: Check if nonce is available
+            if (!doregisterData || !doregisterData.profileUpdateNonce) {
+                console.error('DoRegister: Profile update nonce not available');
+                return;
+            }
             
             // Clear previous errors
             self.clearProfileFormErrors();
@@ -692,23 +721,66 @@
                 }
             }
             
+            // Validate all fields using real-time validation before submission
+            var isValid = true;
+            $('#doregister-profile-edit-form input[required], #doregister-profile-edit-form select[required]').each(function() {
+                var $field = $(this);
+                // Skip hidden fields, checkboxes, radio buttons, and file inputs
+                if ($field.attr('type') === 'hidden' || $field.attr('type') === 'file' || 
+                    $field.attr('type') === 'checkbox' || $field.attr('type') === 'radio') {
+                    return true; // Continue to next field
+                }
+                
+                if (!self.validateProfileField($field)) {
+                    isValid = false;
+                }
+            });
+            
+            // Validate interests separately
+            if (!self.validateProfileInterests()) {
+                isValid = false;
+            }
+            
+            // Validate password fields if password change is enabled
+            if (formData.change_password) {
+                if (!formData.password || formData.password.length < 8) {
+                    self.showFieldError($('#profile_password'), 'Password must be at least 8 characters.');
+                    isValid = false;
+                }
+                if (formData.password !== formData.confirm_password) {
+                    self.showFieldError($('#profile_confirm_password'), 'Passwords do not match.');
+                    isValid = false;
+                }
+            }
+            
             // Display errors if any
-            if (Object.keys(errors).length > 0) {
-                self.displayProfileFormErrors(errors);
+            if (!isValid || Object.keys(errors).length > 0) {
+                console.log('DoRegister: Validation failed', { isValid: isValid, errors: errors });
+                if (Object.keys(errors).length > 0) {
+                    self.displayProfileFormErrors(errors);
+                }
+                // Show a general error message if validation failed
+                if (!isValid) {
+                    $messages.html('<div class="doregister-message doregister-error">Please fix the errors below.</div>').addClass('doregister-error');
+                }
                 return;
             }
+            
+            console.log('DoRegister: Validation passed, submitting form...');
             
             // Disable submit button during request
             var $submitBtn = $('.doregister-btn-save');
             $submitBtn.prop('disabled', true).text('Saving...');
             
             // AJAX Request
+            console.log('DoRegister: Sending AJAX request', formData);
             $.ajax({
                 url: doregisterData.ajaxUrl,
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
                 success: function(response) {
+                    console.log('DoRegister: AJAX success', response);
                     if (response.success) {
                         // SUCCESS: Show success message
                         $messages.html('<div class="doregister-message doregister-success">' + 
@@ -738,14 +810,13 @@
                 },
                 error: function(xhr, status, error) {
                     // AJAX ERROR: Show generic error message
+                    console.error('DoRegister: AJAX error', { xhr: xhr, status: status, error: error });
                     $messages.html('<div class="doregister-message doregister-error">' + 
                         'An error occurred. Please try again.' + 
                         '</div>').addClass('doregister-error');
                     
                     // Re-enable submit button
                     $submitBtn.prop('disabled', false).text('Save Changes');
-                    
-                    console.error('Profile update error:', error);
                 }
             });
         },
@@ -1001,6 +1072,211 @@
                     self.showFieldError($('#profile_photo_upload'), 'An error occurred while uploading the photo.');
                 }
             });
+        },
+        
+        /**
+         * Populate Profile Edit Form
+         * 
+         * Ensures all form fields are properly populated when entering edit mode.
+         * This is mainly for fields that might need special handling (like interests).
+         * 
+         * @method populateProfileEditForm
+         * @returns {void}
+         */
+        populateProfileEditForm: function() {
+            // Form fields are already pre-filled via PHP value attributes
+            // This method is here for any additional JavaScript-based population if needed
+            // For example, if we need to set values dynamically or handle special cases
+            
+            // Clear any existing errors when entering edit mode
+            this.clearProfileFormErrors();
+        },
+        
+        /**
+         * Initialize Profile Edit Form Validation
+         * 
+         * Sets up real-time validation for all profile edit form fields.
+         * Similar to registration form validation but for profile edit form.
+         * 
+         * @method initProfileEditValidation
+         * @returns {void}
+         */
+        initProfileEditValidation: function() {
+            var self = this;
+            var $form = $('#doregister-profile-edit-form');
+            
+            // Only initialize if profile edit form exists
+            if ($form.length === 0) {
+                return;
+            }
+            
+            // REAL-TIME VALIDATION: Validate field when user leaves it (blur event)
+            $(document).on('blur', '#doregister-profile-edit-form input, #doregister-profile-edit-form select', function() {
+                // Skip validation for hidden fields and file inputs
+                var $field = $(this);
+                if ($field.attr('type') === 'hidden' || $field.attr('type') === 'file' || $field.attr('type') === 'checkbox' || $field.attr('type') === 'radio') {
+                    return;
+                }
+                
+                // Validate the field that just lost focus
+                self.validateProfileField($field);
+            });
+            
+            // PASSWORD STRENGTH CHECK: Update strength meter as user types (profile password)
+            $(document).on('input', '#profile_password', function() {
+                // Only check if password change toggle is checked
+                if ($('#change_password_toggle').is(':checked')) {
+                    // Pass the field context so it finds the correct strength meter
+                    self.checkProfilePasswordStrength($(this).val(), $(this));
+                }
+            });
+            
+            // CONFIRM PASSWORD VALIDATION: Check if passwords match in real-time
+            $(document).on('input', '#profile_confirm_password', function() {
+                // Only validate if password change toggle is checked
+                if ($('#change_password_toggle').is(':checked')) {
+                    var password = $('#profile_password').val();
+                    var confirmPassword = $(this).val();
+                    
+                    // Only validate if both fields have values
+                    if (confirmPassword && password !== confirmPassword) {
+                        self.showFieldError($(this), 'Passwords do not match.');
+                    } else {
+                        self.clearFieldError($(this));
+                    }
+                }
+            });
+            
+            // PHONE NUMBER VALIDATION: Filter out invalid characters as user types
+            $(document).on('input', '#profile_phone_number', function() {
+                var phone = $(this).val();
+                // Replace any character that's NOT a digit, +, -, space, (, or )
+                $(this).val(phone.replace(/[^0-9+\-\s()]/g, ''));
+            });
+            
+            // INTERESTS VALIDATION: Check if at least one interest is selected
+            $(document).on('change', '#doregister-profile-edit-form input[name="interests[]"]', function() {
+                self.validateProfileInterests();
+            });
+        },
+        
+        /**
+         * Validate Profile Edit Form Field
+         * 
+         * Validates a single field in the profile edit form.
+         * Similar to validateField but specifically for profile form fields.
+         * 
+         * @method validateProfileField
+         * @param {jQuery} $field - jQuery object of the field to validate
+         * @returns {boolean} True if field is valid, false if validation fails
+         */
+        validateProfileField: function($field) {
+            var self = this;
+            
+            // Extract field properties for validation
+            var value = $field.val();
+            var name = $field.attr('name') || $field.attr('id');
+            var type = $field.attr('type');
+            var required = $field.prop('required');
+            
+            // Clear previous error
+            this.clearFieldError($field);
+            
+            // REQUIRED FIELD CHECK
+            if (required && !value.trim()) {
+                this.showFieldError($field, 'This field is required.');
+                return false;
+            }
+            
+            // TYPE-SPECIFIC VALIDATION: Only validate if field has a value
+            if (value) {
+                // EMAIL VALIDATION
+                if (type === 'email' && !this.isValidEmail(value)) {
+                    this.showFieldError($field, 'Please enter a valid email address.');
+                    return false;
+                }
+                
+                // PHONE NUMBER VALIDATION: Check for valid characters only
+                if (name === 'phone_number' && !/^[0-9+\-\s()]+$/.test(value)) {
+                    this.showFieldError($field, 'Please enter a valid phone number.');
+                    return false;
+                }
+                
+                // PASSWORD LENGTH VALIDATION: Minimum 8 characters (only if password change is enabled)
+                if (name === 'password' && $('#change_password_toggle').is(':checked')) {
+                    if (value.length < 8) {
+                        this.showFieldError($field, 'Password must be at least 8 characters.');
+                        return false;
+                    }
+                }
+            }
+            
+            // All validations passed
+            return true;
+        },
+        
+        /**
+         * Validate Profile Interests
+         * 
+         * Ensures at least one interest is selected in profile edit form.
+         * 
+         * @method validateProfileInterests
+         * @returns {boolean} True if at least one interest is selected, false otherwise
+         */
+        validateProfileInterests: function() {
+            // Count checked interest checkboxes in profile form
+            var checked = $('#doregister-profile-edit-form input[name="interests[]"]:checked').length;
+            
+            // Find error message container for interests field
+            var $errorContainer = $('#doregister-profile-edit-form').find('input[name="interests[]"]').first().closest('.doregister-field-group').find('.doregister-error-message');
+            
+            // Validate: At least one interest must be selected
+            if (checked < 1) {
+                // No interests selected: Show error
+                if ($errorContainer.length) {
+                    $errorContainer.text('Please select at least one interest.').addClass('doregister-error-visible');
+                }
+                return false;
+            } else {
+                // Interests selected: Clear error
+                if ($errorContainer.length) {
+                    $errorContainer.text('').removeClass('doregister-error-visible');
+                }
+                return true;
+            }
+        },
+        
+        /**
+         * Check Password Strength for Profile Form
+         * 
+         * Similar to checkPasswordStrength but works with profile form context.
+         * 
+         * @method checkProfilePasswordStrength
+         * @param {string} password - Password to check
+         * @param {jQuery} $field - Password field element (for context)
+         * @returns {void}
+         */
+        checkProfilePasswordStrength: function(password, $field) {
+            // Find the strength meter within the same field group
+            var $meter = $field.closest('.doregister-field-group').find('.doregister-password-strength');
+            var strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/)) strength++;
+            if (password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            $meter.removeClass('doregister-weak doregister-medium doregister-strong');
+            
+            if (password.length === 0) {
+                $meter.text('').removeClass('doregister-visible');
+            } else if (strength <= 2) {
+                $meter.text('Weak').addClass('doregister-weak doregister-visible');
+            } else if (strength === 3) {
+                $meter.text('Medium').addClass('doregister-medium doregister-visible');
+            } else {
+                $meter.text('Strong').addClass('doregister-strong doregister-visible');
+            }
         },
         
         /**
