@@ -1901,10 +1901,29 @@
  */
 .doregister-profile-wrapper.edit-mode .doregister-profile-view-mode {
     display: none !important; /* Hide view mode - !important to override inline styles */
+    opacity: 0; /* Fade out */
+    transition: opacity 0.3s ease; /* Smooth fade transition */
 }
 
 .doregister-profile-wrapper.edit-mode .doregister-profile-edit-mode {
     display: block !important; /* Show edit mode - !important to override inline styles */
+    animation: fadeIn 0.3s ease; /* Fade in animation */
+}
+
+/**
+ * Fade In Animation
+ * 
+ * Smooth fade-in effect for edit mode.
+ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px); /* Slight upward movement */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0); /* Final position */
+    }
 }
 
 /**
@@ -2025,6 +2044,294 @@
 }
 
 /**
+ * Profile Edit Form Labels
+ * 
+ * Label styling within profile edit form.
+ * Matches registration form label styles.
+ */
+.doregister-profile-edit-mode .doregister-field-group label {
+    display: block; /* Block display for full width */
+    margin-bottom: 8px; /* Spacing before input */
+    font-weight: 600; /* Semi-bold for emphasis */
+    color: #333; /* Dark text color */
+    font-size: 14px; /* Standard readable size */
+}
+
+.doregister-profile-edit-mode .doregister-field-group label .required {
+    color: #e74c3c; /* Red color for required asterisk */
+    margin-left: 3px; /* Small spacing from label text */
+}
+
+/**
+ * Profile Edit Form Radio Buttons
+ * 
+ * Radio button group styling in profile edit form.
+ * Reuses registration form radio styles.
+ */
+.doregister-profile-edit-mode .doregister-radio-group {
+    display: flex; /* Flexbox layout (horizontal arrangement) */
+    flex-wrap: wrap; /* Allows wrapping to new line */
+    gap: 15px; /* Spacing between options */
+    margin-top: 10px; /* Spacing from label above */
+}
+
+.doregister-profile-edit-mode .doregister-radio-label {
+    display: flex; /* Flexbox for horizontal alignment */
+    align-items: center; /* Vertically centers input with text */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    font-weight: normal; /* Regular weight (not bold) */
+}
+
+.doregister-profile-edit-mode .doregister-radio-label input[type="radio"] {
+    margin-right: 8px; /* Spacing between input and text */
+    cursor: pointer; /* Pointer cursor for clickability */
+    width: 18px; /* Standard radio button size */
+    height: 18px; /* Standard radio button size */
+}
+
+/**
+ * Profile Edit Form Checkboxes
+ * 
+ * Checkbox group styling in profile edit form.
+ * Reuses registration form checkbox styles.
+ */
+.doregister-profile-edit-mode .doregister-checkbox-group {
+    display: flex; /* Flexbox layout (horizontal arrangement) */
+    flex-wrap: wrap; /* Allows wrapping to new line */
+    gap: 15px; /* Spacing between options */
+    margin-top: 10px; /* Spacing from label above */
+}
+
+.doregister-profile-edit-mode .doregister-checkbox-label {
+    display: flex; /* Flexbox for horizontal alignment */
+    align-items: center; /* Vertically centers input with text */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    font-weight: normal; /* Regular weight (not bold) */
+}
+
+.doregister-profile-edit-mode .doregister-checkbox-label input[type="checkbox"] {
+    margin-right: 8px; /* Spacing between input and text */
+    cursor: pointer; /* Pointer cursor for clickability */
+    width: 18px; /* Standard checkbox size */
+    height: 18px; /* Standard checkbox size */
+}
+
+/**
+ * Profile Edit Form Date Picker
+ * 
+ * Date input field styling in profile edit form.
+ */
+.doregister-profile-edit-mode input[type="date"] {
+    width: 100%; /* Full width */
+    padding: 12px 15px; /* Comfortable padding */
+    border: 2px solid #ddd; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    transition: border-color 0.3s ease; /* Smooth border transition */
+    box-sizing: border-box; /* Includes padding/border in width */
+    font-family: inherit; /* Inherits font family */
+}
+
+.doregister-profile-edit-mode input[type="date"]:focus {
+    outline: none; /* Removes default browser outline */
+    border-color: #4CAF50; /* Green border on focus */
+}
+
+.doregister-profile-edit-mode input[type="date"].doregister-input-error {
+    border-color: #e74c3c; /* Red border for error state */
+}
+
+/**
+ * Profile Edit Form Error Messages
+ * 
+ * Error message styling in profile edit form.
+ * Matches registration form error styles.
+ */
+.doregister-profile-edit-mode .doregister-error-message {
+    display: block; /* Block display */
+    color: #e74c3c; /* Red color for errors */
+    font-size: 12px; /* Smaller font size */
+    margin-top: 5px; /* Spacing from input field */
+    min-height: 18px; /* Prevents layout shift when error appears */
+}
+
+.doregister-profile-edit-mode .doregister-error-message.doregister-error-visible {
+    display: block; /* Show error message */
+}
+
+/**
+ * Profile Edit Form Password Change Section
+ * 
+ * Styling for password change toggle and fields.
+ */
+.doregister-profile-edit-mode .doregister-password-change-fields {
+    margin-top: 15px; /* Spacing from toggle checkbox */
+    padding-top: 15px; /* Visual separation */
+    border-top: 1px solid #e9ecef; /* Subtle border separator */
+}
+
+.doregister-profile-edit-mode .doregister-password-wrapper {
+    position: relative; /* Positioning context for toggle button */
+    display: flex; /* Flexbox for input and button */
+    align-items: center; /* Vertical alignment */
+}
+
+.doregister-profile-edit-mode .doregister-password-input {
+    padding-right: 45px; /* Space for toggle button */
+}
+
+.doregister-profile-edit-mode .doregister-password-toggle {
+    position: absolute; /* Positioned over input */
+    right: 10px; /* Right edge spacing */
+    background: transparent; /* Transparent background */
+    border: none; /* No border */
+    cursor: pointer; /* Pointer cursor */
+    padding: 5px; /* Clickable area */
+    z-index: 10; /* Above input */
+    display: flex; /* Flexbox for icon */
+    align-items: center; /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
+}
+
+.doregister-profile-edit-mode .doregister-password-toggle-icon {
+    font-size: 18px; /* Icon size */
+    user-select: none; /* Prevents text selection */
+}
+
+/**
+ * Profile Edit Form Password Strength Meter
+ * 
+ * Password strength indicator styling.
+ */
+.doregister-profile-edit-mode .doregister-password-strength {
+    margin-top: 5px; /* Spacing from input */
+    font-size: 12px; /* Smaller font size */
+    font-weight: 600; /* Semi-bold */
+    min-height: 18px; /* Prevents layout shift */
+}
+
+.doregister-profile-edit-mode .doregister-password-strength.doregister-visible {
+    display: block; /* Show strength meter */
+}
+
+.doregister-profile-edit-mode .doregister-password-strength.doregister-weak {
+    color: #e74c3c; /* Red for weak password */
+}
+
+.doregister-profile-edit-mode .doregister-password-strength.doregister-medium {
+    color: #f39c12; /* Orange for medium password */
+}
+
+.doregister-profile-edit-mode .doregister-password-strength.doregister-strong {
+    color: #4CAF50; /* Green for strong password */
+}
+
+/**
+ * Profile Edit Form Country Dropdown
+ * 
+ * Country searchable dropdown styling in profile edit form.
+ */
+.doregister-profile-edit-mode .doregister-country-wrapper {
+    position: relative; /* Positioning context for dropdown */
+}
+
+.doregister-profile-edit-mode .doregister-country-search {
+    width: 100%; /* Full width */
+    padding: 12px 15px; /* Comfortable padding */
+    border: 2px solid #ddd; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    transition: border-color 0.3s ease; /* Smooth border transition */
+    box-sizing: border-box; /* Includes padding/border in width */
+}
+
+.doregister-profile-edit-mode .doregister-country-search:focus {
+    outline: none; /* Removes default browser outline */
+    border-color: #4CAF50; /* Green border on focus */
+}
+
+.doregister-profile-edit-mode .doregister-country-dropdown {
+    position: absolute; /* Positioned relative to wrapper */
+    top: 100%; /* Appears directly below input */
+    left: 0; /* Aligned with left edge */
+    right: 0; /* Aligned with right edge (full width) */
+    background: #fff; /* White background */
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    max-height: 200px; /* Maximum height before scrolling */
+    overflow-y: auto; /* Vertical scrolling if needed */
+    z-index: 1000; /* Above other elements */
+    margin-top: 2px; /* Small gap from input */
+}
+
+.doregister-profile-edit-mode .doregister-country-list {
+    list-style: none; /* Removes default bullet points */
+    margin: 0; /* Removes default margin */
+    padding: 0; /* Removes default padding */
+}
+
+.doregister-profile-edit-mode .doregister-country-item {
+    padding: 10px 15px; /* Clickable area padding */
+    cursor: pointer; /* Pointer cursor (indicates clickable) */
+    transition: background 0.2s ease; /* Smooth hover background change */
+}
+
+.doregister-profile-edit-mode .doregister-country-item:hover {
+    background: #f5f5f5; /* Light gray background on hover */
+}
+
+/**
+ * Profile Edit Form File Input
+ * 
+ * File upload input styling in profile edit form.
+ */
+.doregister-profile-edit-mode .doregister-file-input {
+    width: 100%; /* Full width */
+    padding: 12px 15px; /* Comfortable padding */
+    border: 2px solid #ddd; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    transition: border-color 0.3s ease; /* Smooth border transition */
+    box-sizing: border-box; /* Includes padding/border in width */
+    background: #fff; /* White background */
+    cursor: pointer; /* Pointer cursor */
+}
+
+.doregister-profile-edit-mode .doregister-file-input:focus {
+    outline: none; /* Removes default browser outline */
+    border-color: #4CAF50; /* Green border on focus */
+}
+
+/**
+ * Profile Edit Form Messages
+ * 
+ * Success/error message container styling.
+ */
+.doregister-profile-edit-mode .doregister-form-messages {
+    margin-bottom: 20px; /* Spacing before buttons */
+}
+
+.doregister-profile-edit-mode .doregister-form-messages .doregister-message {
+    padding: 12px 15px; /* Comfortable padding */
+    border-radius: 5px; /* Rounded corners */
+    margin-bottom: 10px; /* Spacing between messages */
+    font-size: 14px; /* Standard readable size */
+}
+
+.doregister-profile-edit-mode .doregister-form-messages .doregister-success {
+    background: #d4edda; /* Light green background */
+    color: #155724; /* Dark green text */
+    border: 1px solid #c3e6cb; /* Green border */
+}
+
+.doregister-profile-edit-mode .doregister-form-messages .doregister-error {
+    background: #f8d7da; /* Light red background */
+    color: #721c24; /* Dark red text */
+    border: 1px solid #f5c6cb; /* Red border */
+}
+
+/**
  * Profile Photo Preview in Edit Mode
  * 
  * Smaller preview of current profile photo in edit form.
@@ -2131,6 +2438,46 @@
      * Smaller font size for mobile screens.
      * Maintains hierarchy while fitting better on small screens.
      */
+    /**
+     * Profile Edit Mode - Mobile
+     * 
+     * Responsive styles for edit mode on mobile devices.
+     */
+    .doregister-profile-edit-mode .doregister-field-group {
+        margin-bottom: 15px; /* Reduced spacing */
+    }
+    
+    .doregister-profile-edit-mode .doregister-input,
+    .doregister-profile-edit-mode input[type="date"],
+    .doregister-profile-edit-mode .doregister-country-search,
+    .doregister-profile-edit-mode .doregister-file-input {
+        padding: 10px 12px; /* Reduced padding */
+        font-size: 16px; /* Larger font for mobile (prevents zoom on iOS) */
+    }
+    
+    .doregister-profile-edit-mode .doregister-radio-group,
+    .doregister-profile-edit-mode .doregister-checkbox-group {
+        flex-direction: column; /* Stack vertically on mobile */
+        gap: 10px; /* Reduced gap */
+    }
+    
+    .doregister-profile-edit-actions {
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 10px; /* Reduced gap */
+    }
+    
+    .doregister-btn-save,
+    .doregister-btn-cancel {
+        width: 100%; /* Full width buttons on mobile */
+        margin-left: 0; /* Remove auto margin */
+    }
+    
+    .doregister-profile-edit-mode .doregister-profile-photo-preview .doregister-current-photo,
+    .doregister-profile-edit-mode .doregister-image-preview img {
+        width: 80px; /* Smaller on mobile */
+        height: 80px; /* Smaller on mobile */
+    }
+    
     .doregister-profile-wrapper h2 {
         font-size: 24px; /* Smaller font (was 32px) */
         margin-bottom: 30px; /* Reduced spacing (was 40px) */
