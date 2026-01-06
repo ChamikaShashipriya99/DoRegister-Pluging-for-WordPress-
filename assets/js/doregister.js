@@ -662,6 +662,7 @@
             var formData = {
                 action: 'doregister_update_profile',
                 nonce: doregisterData.profileUpdateNonce,
+                user_id: $('input[name="user_id"]').val() || $('.doregister-profile-wrapper').data('user-id'), // Get user ID from form or wrapper
                 full_name: $('#profile_full_name').val().trim(),
                 email: $('#profile_email').val().trim(),
                 phone_number: $('#profile_phone_number').val().trim(),
