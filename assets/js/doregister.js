@@ -114,6 +114,10 @@
             // Set up profile edit mode functionality
             // Handles: edit button, cancel button, form submission
             this.initProfileEdit();
+            
+            // Set up profile edit form features
+            // Handles: password toggle, photo upload, country dropdown
+            this.initProfileEditFeatures();
         },
         
         /**
@@ -569,8 +573,12 @@
             $(document).on('click', '.doregister-btn-edit', function(e) {
                 e.preventDefault();
                 
-                // Add edit-mode class to wrapper (triggers CSS to show/hide elements)
+                // Add edit-mode class to wrapper
                 $wrapper.addClass('edit-mode');
+                
+                // Explicitly show edit mode elements (override inline styles)
+                $('.doregister-profile-edit-mode').show();
+                $('.doregister-profile-view-mode').hide();
                 
                 // Focus on first input field for better UX
                 $('#profile_full_name').focus();
@@ -580,8 +588,12 @@
             $(document).on('click', '.doregister-btn-cancel', function(e) {
                 e.preventDefault();
                 
-                // Remove edit-mode class (triggers CSS to show/hide elements)
+                // Remove edit-mode class
                 $wrapper.removeClass('edit-mode');
+                
+                // Explicitly hide edit mode and show view mode
+                $('.doregister-profile-edit-mode').hide();
+                $('.doregister-profile-view-mode').show();
                 
                 // Clear any error messages
                 self.clearProfileFormErrors();
@@ -622,8 +634,24 @@
                 action: 'doregister_update_profile',
                 nonce: doregisterData.profileUpdateNonce,
                 full_name: $('#profile_full_name').val().trim(),
-                email: $('#profile_email').val().trim()
+                email: $('#profile_email').val().trim(),
+                phone_number: $('#profile_phone_number').val().trim(),
+                country: $('#profile_country').val().trim(),
+                city: $('#profile_city').val().trim(),
+                gender: $('input[name="gender"]:checked').val() || '',
+                date_of_birth: $('#profile_date_of_birth').val(),
+                interests: $('input[name="interests[]"]:checked').map(function() { return $(this).val(); }).get(),
+                profile_photo: $('#profile_photo').val(),
+                change_password: $('#change_password_toggle').is(':checked'),
+                password: '',
+                confirm_password: ''
             };
+            
+            // Handle password change if toggle is checked
+            if (formData.change_password) {
+                formData.password = $('#profile_password').val();
+                formData.confirm_password = $('#profile_confirm_password').val();
+            }
             
             // Basic frontend validation
             var errors = {};
@@ -636,6 +664,32 @@
                 errors.email = 'Email is required.';
             } else if (!self.isValidEmail(formData.email)) {
                 errors.email = 'Please enter a valid email address.';
+            }
+            
+            if (!formData.phone_number) {
+                errors.phone_number = 'Phone number is required.';
+            }
+            
+            if (!formData.country) {
+                errors.country = 'Country is required.';
+            }
+            
+            if (formData.interests.length < 1) {
+                errors.interests = 'Please select at least one interest.';
+            }
+            
+            if (!formData.profile_photo) {
+                errors.profile_photo = 'Profile photo is required.';
+            }
+            
+            // Password validation (only if change password is checked)
+            if (formData.change_password) {
+                if (!formData.password || formData.password.length < 8) {
+                    errors.password = 'Password must be at least 8 characters.';
+                }
+                if (formData.password !== formData.confirm_password) {
+                    errors.confirm_password = 'Passwords do not match.';
+                }
             }
             
             // Display errors if any
@@ -706,23 +760,39 @@
          * @returns {void}
          */
         displayProfileFormErrors: function(errors) {
-            // Map field names to input IDs
+            // Map field names to input IDs or selectors
             var fieldMap = {
                 'full_name': '#profile_full_name',
-                'email': '#profile_email'
+                'email': '#profile_email',
+                'phone_number': '#profile_phone_number',
+                'country': '#profile_country',
+                'city': '#profile_city',
+                'gender': 'input[name="gender"]',
+                'date_of_birth': '#profile_date_of_birth',
+                'interests': '.doregister-checkbox-group',
+                'profile_photo': '#profile_photo_upload',
+                'password': '#profile_password',
+                'confirm_password': '#profile_confirm_password'
             };
             
             // Display error for each field
             for (var field in errors) {
                 if (errors.hasOwnProperty(field) && fieldMap[field]) {
                     var $field = $(fieldMap[field]);
-                    var $errorMsg = $field.siblings('.doregister-error-message');
                     
-                    // Add error class to input
-                    $field.addClass('doregister-input-error');
-                    
-                    // Display error message
-                    $errorMsg.text(errors[field]).show();
+                    // For checkboxes/radio groups, find the container
+                    if (field === 'interests') {
+                        var $errorMsg = $field.siblings('.doregister-error-message');
+                        $errorMsg.text(errors[field]).show();
+                    } else {
+                        var $errorMsg = $field.siblings('.doregister-error-message');
+                        
+                        // Add error class to input
+                        $field.addClass('doregister-input-error');
+                        
+                        // Display error message
+                        $errorMsg.text(errors[field]).show();
+                    }
                 }
             }
         },
@@ -741,6 +811,196 @@
             
             // Clear all error messages
             $('#doregister-profile-edit-form .doregister-error-message').text('').hide();
+        },
+        
+        /**
+         * Initialize Profile Edit Form Features
+         * 
+         * Handles:
+         * - Password change toggle
+         * - Photo upload preview
+         * - Country dropdown initialization
+         * 
+         * @method initProfileEditFeatures
+         * @returns {void}
+         */
+        initProfileEditFeatures: function() {
+            var self = this;
+            var $wrapper = $('.doregister-profile-wrapper');
+            
+            // Only initialize if profile wrapper exists
+            if ($wrapper.length === 0) {
+                return;
+            }
+            
+            // PASSWORD CHANGE TOGGLE: Show/hide password fields
+            $(document).on('change', '#change_password_toggle', function() {
+                var $passwordFields = $('.doregister-password-change-fields');
+                if ($(this).is(':checked')) {
+                    $passwordFields.slideDown(300);
+                    // Make password fields required
+                    $('#profile_password, #profile_confirm_password').prop('required', true);
+                } else {
+                    $passwordFields.slideUp(300);
+                    // Remove required and clear values
+                    $('#profile_password, #profile_confirm_password').prop('required', false).val('');
+                    // Clear errors
+                    $('#profile_password, #profile_confirm_password').removeClass('doregister-input-error');
+                    $('#profile_password, #profile_confirm_password').siblings('.doregister-error-message').text('').hide();
+                }
+            });
+            
+            // PHOTO UPLOAD PREVIEW: Show preview when file is selected
+            $(document).on('change', '#profile_photo_upload', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    // Validate file type
+                    if (!file.type.match('image.*')) {
+                        self.showFieldError($(this), 'Please select an image file.');
+                        return;
+                    }
+                    
+                    // Validate file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        self.showFieldError($(this), 'File size must be less than 5MB.');
+                        return;
+                    }
+                    
+                    // Use FileReader to preview image
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        var $preview = $('#doregister-profile-edit-form .doregister-image-preview');
+                        $preview.html('<img src="' + e.target.result + '" alt="Preview" style="max-width: 200px; max-height: 200px; margin-top: 10px; border-radius: 10px;">');
+                        
+                        // Upload file via AJAX
+                        self.uploadProfilePhoto(file);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Initialize country dropdown for profile form
+            // Only if country search input exists in profile form
+            if ($('#profile_country.doregister-country-search').length > 0) {
+                // Reuse the country dropdown initialization from registration
+                // The initCountryDropdown method should handle both forms
+                // But we need to make sure it works with profile form IDs
+                self.initProfileCountryDropdown();
+            }
+        },
+        
+        /**
+         * Initialize Country Dropdown for Profile Form
+         * 
+         * Similar to registration form but uses profile-specific IDs.
+         * 
+         * @method initProfileCountryDropdown
+         * @returns {void}
+         */
+        initProfileCountryDropdown: function() {
+            var self = this;
+            var $countryInput = $('#profile_country.doregister-country-search');
+            var $dropdown = $countryInput.siblings('.doregister-country-dropdown');
+            
+            if ($countryInput.length === 0 || !doregisterData.countries) {
+                return;
+            }
+            
+            var countries = doregisterData.countries;
+            
+            // Show dropdown on focus
+            $countryInput.on('focus', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                // Filter countries
+                var filtered = countries.filter(function(country) {
+                    return country.toLowerCase().includes(searchTerm);
+                }).slice(0, 10);
+                
+                if (filtered.length > 0) {
+                    var html = '<ul class="doregister-country-list">';
+                    filtered.forEach(function(country) {
+                        html += '<li class="doregister-country-item" data-country="' + self.escapeHtml(country) + '">' + self.escapeHtml(country) + '</li>';
+                    });
+                    html += '</ul>';
+                    $dropdown.html(html).show();
+                } else {
+                    $dropdown.hide().empty();
+                }
+            });
+            
+            // Filter countries as user types
+            $countryInput.on('input', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                // Filter countries
+                var filtered = countries.filter(function(country) {
+                    return country.toLowerCase().includes(searchTerm);
+                }).slice(0, 10);
+                
+                if (filtered.length > 0) {
+                    var html = '<ul class="doregister-country-list">';
+                    filtered.forEach(function(country) {
+                        html += '<li class="doregister-country-item" data-country="' + self.escapeHtml(country) + '">' + self.escapeHtml(country) + '</li>';
+                    });
+                    html += '</ul>';
+                    $dropdown.html(html).show();
+                } else {
+                    $dropdown.hide().empty();
+                }
+            });
+            
+            // Handle country selection
+            $dropdown.on('click', '.doregister-country-item', function() {
+                var country = $(this).data('country');
+                $countryInput.val(country);
+                $dropdown.hide().empty();
+            });
+            
+            // Hide dropdown when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.doregister-country-wrapper').length) {
+                    $dropdown.hide();
+                }
+            });
+        },
+        
+        /**
+         * Upload Profile Photo via AJAX
+         * 
+         * Uploads the selected photo file and stores the URL in hidden field.
+         * 
+         * @method uploadProfilePhoto
+         * @param {File} file - The file to upload
+         * @returns {void}
+         */
+        uploadProfilePhoto: function(file) {
+            var self = this;
+            var formData = new FormData();
+            formData.append('action', 'doregister_upload_photo');
+            formData.append('nonce', doregisterData.nonce);
+            formData.append('profile_photo', file);
+            
+            $.ajax({
+                url: doregisterData.ajaxUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.success && response.data.url) {
+                        // Store uploaded photo URL in hidden field
+                        $('#profile_photo').val(response.data.url);
+                        // Clear any errors
+                        $('#profile_photo_upload').removeClass('doregister-input-error');
+                        $('#profile_photo_upload').siblings('.doregister-error-message').text('').hide();
+                    } else {
+                        self.showFieldError($('#profile_photo_upload'), response.data.message || 'Photo upload failed.');
+                    }
+                },
+                error: function() {
+                    self.showFieldError($('#profile_photo_upload'), 'An error occurred while uploading the photo.');
+                }
+            });
         },
         
         /**

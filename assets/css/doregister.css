@@ -1900,11 +1900,11 @@
  * When edit mode is active, show edit form and hide view.
  */
 .doregister-profile-wrapper.edit-mode .doregister-profile-view-mode {
-    display: none; /* Hide view mode */
+    display: none !important; /* Hide view mode - !important to override inline styles */
 }
 
 .doregister-profile-wrapper.edit-mode .doregister-profile-edit-mode {
-    display: block; /* Show edit mode */
+    display: block !important; /* Show edit mode - !important to override inline styles */
 }
 
 /**
@@ -2022,6 +2022,64 @@
 
 .doregister-profile-edit-mode .doregister-input.doregister-input-error {
     border-color: #e74c3c; /* Red border for error state */
+}
+
+/**
+ * Profile Photo Preview in Edit Mode
+ * 
+ * Smaller preview of current profile photo in edit form.
+ * 
+ * Design Intent:
+ * - Smaller size (100px) - More compact than view mode
+ * - Rounded corners - Modern look
+ * - Margin for spacing
+ */
+.doregister-profile-edit-mode .doregister-profile-photo-preview {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.doregister-profile-edit-mode .doregister-profile-photo-preview .doregister-current-photo {
+    width: 100px; /* Smaller than view mode (150px) */
+    height: 100px; /* Square aspect ratio */
+    border-radius: 10px; /* Rounded corners */
+    object-fit: cover; /* Maintains aspect ratio */
+    border: 2px solid #4CAF50; /* Green border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: block; /* Block display */
+}
+
+.doregister-profile-edit-mode .doregister-profile-photo-preview .doregister-no-photo-small {
+    width: 100px; /* Match photo size */
+    height: 100px; /* Match photo size */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Vertical centering */
+    justify-content: center; /* Horizontal centering */
+    border: 2px dashed #ddd; /* Dashed border for placeholder */
+    border-radius: 10px; /* Rounded corners */
+    color: #999; /* Gray text */
+    font-size: 12px; /* Smaller text */
+    text-align: center; /* Center text */
+    padding: 10px; /* Internal padding */
+}
+
+/**
+ * New Photo Preview in Edit Mode
+ * 
+ * Preview of newly selected photo before upload.
+ */
+.doregister-profile-edit-mode .doregister-image-preview {
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.doregister-profile-edit-mode .doregister-image-preview img {
+    max-width: 100px; /* Smaller preview */
+    max-height: 100px; /* Smaller preview */
+    border-radius: 10px; /* Rounded corners */
+    border: 2px solid #4CAF50; /* Green border */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    display: block; /* Block display */
 }
 
 /* ==========================================================================

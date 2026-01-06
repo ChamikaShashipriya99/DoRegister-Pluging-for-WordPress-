@@ -232,6 +232,155 @@ class DoRegister_Profile {
                                 </div>
                             </div>
                         </div>
+                        
+                        <!-- Category 2: Contact Details (Editable) -->
+                        <div class="doregister-profile-category">
+                            <h3 class="doregister-profile-category-title">Contact Details</h3>
+                            <div class="doregister-profile-category-content">
+                                <!-- Phone Number Field (Editable) -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_phone_number">Phone Number <span class="required">*</span></label>
+                                    <input type="tel" id="profile_phone_number" name="phone_number" class="doregister-input" value="<?php echo esc_attr($user->phone_number); ?>" required>
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                                
+                                <!-- Country Field (Editable - Searchable Dropdown) -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_country">Country <span class="required">*</span></label>
+                                    <div class="doregister-country-wrapper">
+                                        <input type="text" id="profile_country" name="country" class="doregister-input doregister-country-search" placeholder="Search country..." value="<?php echo esc_attr($user->country); ?>" required>
+                                        <div class="doregister-country-dropdown"></div>
+                                    </div>
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                                
+                                <!-- City Field (Editable - Optional) -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_city">City</label>
+                                    <input type="text" id="profile_city" name="city" class="doregister-input" value="<?php echo esc_attr($user->city ?? ''); ?>">
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 3: Personal Details (Editable) -->
+                        <div class="doregister-profile-category">
+                            <h3 class="doregister-profile-category-title">Personal Details</h3>
+                            <div class="doregister-profile-category-content">
+                                <!-- Gender Field (Editable - Radio Buttons) -->
+                                <div class="doregister-field-group">
+                                    <label>Gender</label>
+                                    <div class="doregister-radio-group">
+                                        <label class="doregister-radio-label">
+                                            <input type="radio" name="gender" value="male" class="doregister-radio" <?php checked($user->gender, 'male'); ?>>
+                                            <span>Male</span>
+                                        </label>
+                                        <label class="doregister-radio-label">
+                                            <input type="radio" name="gender" value="female" class="doregister-radio" <?php checked($user->gender, 'female'); ?>>
+                                            <span>Female</span>
+                                        </label>
+                                        <label class="doregister-radio-label">
+                                            <input type="radio" name="gender" value="other" class="doregister-radio" <?php checked($user->gender, 'other'); ?>>
+                                            <span>Other</span>
+                                        </label>
+                                    </div>
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                                
+                                <!-- Date of Birth Field (Editable) -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_date_of_birth">Date of Birth</label>
+                                    <input type="date" id="profile_date_of_birth" name="date_of_birth" class="doregister-input" value="<?php echo esc_attr($user->date_of_birth ?? ''); ?>">
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                                
+                                <!-- Interests Field (Editable - Checkboxes) -->
+                                <div class="doregister-field-group">
+                                    <label>Interests <span class="required">*</span></label>
+                                    <div class="doregister-checkbox-group">
+                                        <?php
+                                        $available_interests = array('technology', 'sports', 'music', 'travel', 'reading', 'cooking');
+                                        $user_interests = is_array($user->interests) ? $user->interests : array();
+                                        foreach ($available_interests as $interest):
+                                        ?>
+                                        <label class="doregister-checkbox-label">
+                                            <input type="checkbox" name="interests[]" value="<?php echo esc_attr($interest); ?>" class="doregister-checkbox" <?php checked(in_array($interest, $user_interests)); ?>>
+                                            <span><?php echo esc_html(ucfirst($interest)); ?></span>
+                                        </label>
+                                        <?php endforeach; ?>
+                                    </div>
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 4: Profile Media (Editable) -->
+                        <div class="doregister-profile-category">
+                            <h3 class="doregister-profile-category-title">Profile Media</h3>
+                            <div class="doregister-profile-category-content">
+                                <!-- Profile Photo Upload Field -->
+                                <div class="doregister-field-group">
+                                    <label for="profile_photo_upload">Profile Photo <span class="required">*</span></label>
+                                    <!-- Current Photo Preview -->
+                                    <div class="doregister-profile-photo-preview">
+                                        <?php if ($user->profile_photo): ?>
+                                            <img src="<?php echo esc_url($user->profile_photo); ?>" alt="Current Profile Photo" class="doregister-current-photo">
+                                        <?php else: ?>
+                                            <div class="doregister-no-photo-small">No photo uploaded</div>
+                                        <?php endif; ?>
+                                    </div>
+                                    <!-- File Input -->
+                                    <input type="file" id="profile_photo_upload" name="profile_photo_upload" accept="image/*" class="doregister-input doregister-file-input">
+                                    <!-- New Photo Preview Container (populated by JavaScript) -->
+                                    <div class="doregister-image-preview"></div>
+                                    <!-- Hidden field to store uploaded photo URL -->
+                                    <input type="hidden" id="profile_photo" name="profile_photo" value="<?php echo esc_attr($user->profile_photo ?? ''); ?>">
+                                    <span class="doregister-error-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Category 5: Password Change (Optional) -->
+                        <div class="doregister-profile-category">
+                            <h3 class="doregister-profile-category-title">Change Password</h3>
+                            <div class="doregister-profile-category-content">
+                                <!-- Change Password Toggle -->
+                                <div class="doregister-field-group">
+                                    <label class="doregister-checkbox-label">
+                                        <input type="checkbox" id="change_password_toggle" name="change_password" class="doregister-checkbox" value="true">
+                                        <span>Change Password</span>
+                                    </label>
+                                </div>
+                                
+                                <!-- Password Fields (Hidden by default) -->
+                                <div class="doregister-password-change-fields" style="display: none;">
+                                    <!-- New Password Field -->
+                                    <div class="doregister-field-group">
+                                        <label for="profile_password">New Password <span class="required">*</span></label>
+                                        <div class="doregister-password-wrapper">
+                                            <input type="password" id="profile_password" name="password" class="doregister-input doregister-password-input">
+                                            <button type="button" class="doregister-password-toggle" aria-label="Show password">
+                                                <span class="doregister-password-toggle-icon">👁️</span>
+                                            </button>
+                                        </div>
+                                        <div class="doregister-password-strength"></div>
+                                        <span class="doregister-error-message"></span>
+                                    </div>
+                                    
+                                    <!-- Confirm Password Field -->
+                                    <div class="doregister-field-group">
+                                        <label for="profile_confirm_password">Confirm New Password <span class="required">*</span></label>
+                                        <div class="doregister-password-wrapper">
+                                            <input type="password" id="profile_confirm_password" name="confirm_password" class="doregister-input doregister-password-input">
+                                            <button type="button" class="doregister-password-toggle" aria-label="Show password">
+                                                <span class="doregister-password-toggle-icon">👁️</span>
+                                            </button>
+                                        </div>
+                                        <span class="doregister-error-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
                 
