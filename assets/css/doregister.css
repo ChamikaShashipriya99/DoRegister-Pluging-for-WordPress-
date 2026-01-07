@@ -698,22 +698,73 @@
  */
 .doregister-country-wrapper {
     position: relative; /* Positioning context for absolute dropdown */
+    width: 100%; /* Full width of container */
+}
+
+/**
+ * Country Search Input Field
+ * 
+ * Enhanced styling for the country search input field.
+ * Provides visual feedback and modern appearance.
+ * 
+ * Design Intent:
+ * - Full width with proper padding
+ * - Search icon indicator (via background or pseudo-element)
+ * - Smooth transitions for better UX
+ * - Enhanced focus state
+ */
+.doregister-country-search {
+    width: 100%; /* Full width of wrapper */
+    padding: 12px 15px; /* Comfortable padding */
+    padding-right: 40px; /* Extra right padding for search icon space */
+    border: 2px solid #ddd; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    font-size: 14px; /* Standard readable size */
+    transition: all 0.3s ease; /* Smooth transitions for all properties */
+    box-sizing: border-box; /* Includes padding/border in width */
+    background: #fff; /* White background */
+    color: #333; /* Dark text color */
+}
+
+/**
+ * Country Search Input Focus State
+ * 
+ * Enhanced focus styling with border color change and subtle shadow.
+ * Provides clear visual feedback when field is active.
+ */
+.doregister-country-search:focus {
+    outline: none; /* Removes default browser outline */
+    border-color: #4CAF50; /* Green border on focus (primary color) */
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1); /* Subtle green glow */
+    background: #fafafa; /* Slight background change for focus indication */
+}
+
+/**
+ * Country Search Input Placeholder
+ * 
+ * Styling for placeholder text in search field.
+ * Lighter color to distinguish from actual input.
+ */
+.doregister-country-search::placeholder {
+    color: #999; /* Light gray for placeholder text */
+    font-style: italic; /* Italic style for placeholder */
 }
 
 /**
  * Country Dropdown Menu
  * 
  * Absolutely positioned dropdown that appears below the search input.
- * Displays filtered country list as user types. Hidden by default.
+ * Displays filtered country list as user types. Enhanced with shadows
+ * and smooth animations.
  * 
  * Design Intent:
  * - position: absolute - Positioned relative to wrapper
- * - top: 100% - Appears directly below input (no gap)
- * - left: 0, right: 0 - Full width of wrapper
- * - border-top: none - Seamless connection with input above
- * - Rounded bottom corners only - Matches input's rounded top
- * - max-height: 200px - Limits height, enables scrolling for long lists
- * - overflow-y: auto - Vertical scrollbar when content exceeds max-height
+ * - top: 100% - Appears directly below input
+ * - Smooth animation on show/hide
+ * - Enhanced shadow for depth
+ * - Rounded corners for modern appearance
+ * - max-height: 250px - Increased height for better visibility
+ * - overflow-y: auto - Vertical scrollbar when needed
  * - z-index: 1000 - Appears above other content
  * - display: none - Hidden by default (shown via JavaScript)
  * 
@@ -721,6 +772,7 @@
  * - JavaScript shows/hides based on search input
  * - Filters countries as user types
  * - Scrolls when list exceeds max-height
+ * - Smooth fade-in animation
  */
 .doregister-country-dropdown {
     position: absolute; /* Positioned relative to wrapper */
@@ -728,13 +780,42 @@
     left: 0; /* Aligned with left edge */
     right: 0; /* Aligned with right edge (full width) */
     background: #fff; /* White background */
-    border: 2px solid #ddd; /* Matches input border */
+    border: 2px solid #4CAF50; /* Green border matching focus state */
     border-top: none; /* No top border (seamless with input) */
     border-radius: 0 0 5px 5px; /* Rounded bottom corners only */
-    max-height: 200px; /* Maximum height before scrolling */
+    max-height: 250px; /* Maximum height before scrolling (increased from 200px) */
     overflow-y: auto; /* Vertical scrollbar when needed */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
     z-index: 1000; /* Appears above other content */
     display: none; /* Hidden by default (shown via JavaScript) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow for depth */
+    margin-top: -2px; /* Overlaps with input border for seamless connection */
+    animation: fadeInDown 0.2s ease-out; /* Smooth fade-in animation */
+}
+
+/**
+ * Country Dropdown Scrollbar Styling
+ * 
+ * Custom scrollbar styling for better appearance.
+ * Webkit browsers (Chrome, Safari, Edge).
+ */
+.doregister-country-dropdown::-webkit-scrollbar {
+    width: 8px; /* Narrow scrollbar width */
+}
+
+.doregister-country-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light gray track */
+    border-radius: 4px; /* Rounded track */
+}
+
+.doregister-country-dropdown::-webkit-scrollbar-thumb {
+    background: #4CAF50; /* Green scrollbar thumb */
+    border-radius: 4px; /* Rounded thumb */
+    transition: background 0.2s ease; /* Smooth color transition */
+}
+
+.doregister-country-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #45a049; /* Darker green on hover */
 }
 
 /**
@@ -753,31 +834,93 @@
  * Country List Item
  * 
  * Individual country option in the dropdown. Clickable item that
- * selects the country when clicked.
+ * selects the country when clicked. Enhanced with better spacing
+ * and visual feedback.
  * 
  * Design Intent:
- * - Generous padding (10px 15px) - Large clickable area
+ * - Generous padding (12px 15px) - Large clickable area
  * - cursor: pointer - Indicates clickability
  * - Smooth background transition - Hover effect
+ * - Border-bottom for separation (except last item)
+ * - Font size matching input
  * 
  * Interaction:
  * - JavaScript handles click to select country
  * - Hover state provides visual feedback
+ * - Active state shows selection
  */
 .doregister-country-item {
-    padding: 10px 15px; /* Clickable area padding */
+    padding: 12px 15px; /* Clickable area padding (increased from 10px) */
     cursor: pointer; /* Pointer cursor (indicates clickable) */
-    transition: background 0.2s ease; /* Smooth hover background change */
+    transition: all 0.2s ease; /* Smooth transitions for all properties */
+    font-size: 14px; /* Standard readable font size */
+    color: #333; /* Dark text color */
+    border-bottom: 1px solid #f0f0f0; /* Subtle border between items */
+}
+
+/**
+ * Last Country Item
+ * 
+ * Removes border-bottom from last item for cleaner appearance.
+ */
+.doregister-country-item:last-child {
+    border-bottom: none; /* No border on last item */
 }
 
 /**
  * Country Item Hover State
  * 
- * Visual feedback when hovering over country option.
- * Light gray background indicates interactive element.
+ * Enhanced visual feedback when hovering over country option.
+ * Green background with white text for better contrast.
  */
 .doregister-country-item:hover {
-    background: #f5f5f5; /* Light gray background on hover */
+    background: #4CAF50; /* Green background on hover */
+    color: #fff; /* White text on hover */
+    padding-left: 20px; /* Slight left padding increase for animation effect */
+}
+
+/**
+ * Country Item Active/Selected State
+ * 
+ * Visual indication when a country is selected.
+ * Can be applied via JavaScript when item is clicked.
+ */
+.doregister-country-item.active,
+.doregister-country-item.selected {
+    background: #e8f5e9; /* Light green background */
+    color: #2e7d32; /* Dark green text */
+    font-weight: 500; /* Medium weight for emphasis */
+}
+
+/**
+ * Fade In Down Animation
+ * 
+ * Keyframe animation for dropdown appearance.
+ * Creates smooth slide-down and fade-in effect.
+ */
+@keyframes fadeInDown {
+    from {
+        opacity: 0; /* Start invisible */
+        transform: translateY(-10px); /* Start slightly above */
+    }
+    to {
+        opacity: 1; /* End fully visible */
+        transform: translateY(0); /* End at normal position */
+    }
+}
+
+/**
+ * Empty State Message
+ * 
+ * Styling for "No countries found" message when search
+ * returns no results. Can be added via JavaScript.
+ */
+.doregister-country-no-results {
+    padding: 15px; /* Comfortable padding */
+    text-align: center; /* Centered text */
+    color: #999; /* Light gray text */
+    font-style: italic; /* Italic style */
+    font-size: 14px; /* Standard readable size */
 }
 
 /* ==========================================================================
@@ -2343,21 +2486,32 @@
  */
 .doregister-profile-edit-mode .doregister-country-wrapper {
     position: relative; /* Positioning context for dropdown */
+    width: 100%; /* Full width */
 }
 
 .doregister-profile-edit-mode .doregister-country-search {
     width: 100%; /* Full width */
     padding: 12px 15px; /* Comfortable padding */
+    padding-right: 40px; /* Extra right padding for search icon space */
     border: 2px solid #ddd; /* Light gray border */
     border-radius: 5px; /* Rounded corners */
     font-size: 14px; /* Standard readable size */
-    transition: border-color 0.3s ease; /* Smooth border transition */
+    transition: all 0.3s ease; /* Smooth transitions for all properties */
     box-sizing: border-box; /* Includes padding/border in width */
+    background: #fff; /* White background */
+    color: #333; /* Dark text color */
 }
 
 .doregister-profile-edit-mode .doregister-country-search:focus {
     outline: none; /* Removes default browser outline */
     border-color: #4CAF50; /* Green border on focus */
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1); /* Subtle green glow */
+    background: #fafafa; /* Slight background change for focus indication */
+}
+
+.doregister-profile-edit-mode .doregister-country-search::placeholder {
+    color: #999; /* Light gray for placeholder text */
+    font-style: italic; /* Italic style for placeholder */
 }
 
 .doregister-profile-edit-mode .doregister-country-dropdown {
@@ -2366,13 +2520,35 @@
     left: 0; /* Aligned with left edge */
     right: 0; /* Aligned with right edge (full width) */
     background: #fff; /* White background */
-    border: 1px solid #ddd; /* Light border */
-    border-radius: 5px; /* Rounded corners */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-    max-height: 200px; /* Maximum height before scrolling */
+    border: 2px solid #4CAF50; /* Green border matching focus state */
+    border-top: none; /* No top border (seamless with input) */
+    border-radius: 0 0 5px 5px; /* Rounded bottom corners only */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Enhanced shadow for depth */
+    max-height: 250px; /* Maximum height before scrolling (increased) */
     overflow-y: auto; /* Vertical scrolling if needed */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
     z-index: 1000; /* Above other elements */
-    margin-top: 2px; /* Small gap from input */
+    margin-top: -2px; /* Overlaps with input border for seamless connection */
+    animation: fadeInDown 0.2s ease-out; /* Smooth fade-in animation */
+}
+
+.doregister-profile-edit-mode .doregister-country-dropdown::-webkit-scrollbar {
+    width: 8px; /* Narrow scrollbar width */
+}
+
+.doregister-profile-edit-mode .doregister-country-dropdown::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light gray track */
+    border-radius: 4px; /* Rounded track */
+}
+
+.doregister-profile-edit-mode .doregister-country-dropdown::-webkit-scrollbar-thumb {
+    background: #4CAF50; /* Green scrollbar thumb */
+    border-radius: 4px; /* Rounded thumb */
+    transition: background 0.2s ease; /* Smooth color transition */
+}
+
+.doregister-profile-edit-mode .doregister-country-dropdown::-webkit-scrollbar-thumb:hover {
+    background: #45a049; /* Darker green on hover */
 }
 
 .doregister-profile-edit-mode .doregister-country-list {
@@ -2382,13 +2558,29 @@
 }
 
 .doregister-profile-edit-mode .doregister-country-item {
-    padding: 10px 15px; /* Clickable area padding */
+    padding: 12px 15px; /* Clickable area padding (increased) */
     cursor: pointer; /* Pointer cursor (indicates clickable) */
-    transition: background 0.2s ease; /* Smooth hover background change */
+    transition: all 0.2s ease; /* Smooth transitions for all properties */
+    font-size: 14px; /* Standard readable font size */
+    color: #333; /* Dark text color */
+    border-bottom: 1px solid #f0f0f0; /* Subtle border between items */
+}
+
+.doregister-profile-edit-mode .doregister-country-item:last-child {
+    border-bottom: none; /* No border on last item */
 }
 
 .doregister-profile-edit-mode .doregister-country-item:hover {
-    background: #f5f5f5; /* Light gray background on hover */
+    background: #4CAF50; /* Green background on hover */
+    color: #fff; /* White text on hover */
+    padding-left: 20px; /* Slight left padding increase for animation effect */
+}
+
+.doregister-profile-edit-mode .doregister-country-item.active,
+.doregister-profile-edit-mode .doregister-country-item.selected {
+    background: #e8f5e9; /* Light green background */
+    color: #2e7d32; /* Dark green text */
+    font-weight: 500; /* Medium weight for emphasis */
 }
 
 /**
