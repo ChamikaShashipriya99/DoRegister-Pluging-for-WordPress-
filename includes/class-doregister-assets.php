@@ -140,7 +140,11 @@ class DoRegister_Assets {
             
             // Country list for searchable dropdown
             // JavaScript uses this to populate country search functionality
-            'countries' => $this->get_countries_list() // Array of country names
+            'countries' => $this->get_countries_list(), // Array of country names
+            
+            // Country phone codes mapping
+            // JavaScript uses this to auto-fill phone code when country is selected
+            'countryPhoneCodes' => $this->get_country_phone_codes() // Array: country name => phone code
         ));
     }
     
@@ -353,6 +357,70 @@ class DoRegister_Assets {
             'South Africa', 'Egypt', 'Nigeria', 'Kenya', 'Morocco',
             'Russia', 'Turkey', 'Saudi Arabia', 'UAE', 'Israel',
             'New Zealand', 'Bangladesh', 'Pakistan', 'Sri Lanka', 'Nepal'
+        );
+    }
+    
+    /**
+     * Get country phone codes mapping
+     * 
+     * Returns an associative array mapping country names to their international dialing codes.
+     * Used by JavaScript to automatically add phone code when user selects a country.
+     * 
+     * @since 1.0.0
+     * @return array Associative array: country name => phone code (e.g., 'United States' => '+1')
+     */
+    private function get_country_phone_codes() {
+        return array(
+            'United States' => '+1',
+            'United Kingdom' => '+44',
+            'Canada' => '+1',
+            'Australia' => '+61',
+            'Germany' => '+49',
+            'France' => '+33',
+            'Italy' => '+39',
+            'Spain' => '+34',
+            'Netherlands' => '+31',
+            'Belgium' => '+32',
+            'Switzerland' => '+41',
+            'Austria' => '+43',
+            'Sweden' => '+46',
+            'Norway' => '+47',
+            'Denmark' => '+45',
+            'Finland' => '+358',
+            'Poland' => '+48',
+            'Portugal' => '+351',
+            'Greece' => '+30',
+            'Ireland' => '+353',
+            'India' => '+91',
+            'China' => '+86',
+            'Japan' => '+81',
+            'South Korea' => '+82',
+            'Singapore' => '+65',
+            'Malaysia' => '+60',
+            'Thailand' => '+66',
+            'Indonesia' => '+62',
+            'Philippines' => '+63',
+            'Vietnam' => '+84',
+            'Brazil' => '+55',
+            'Mexico' => '+52',
+            'Argentina' => '+54',
+            'Chile' => '+56',
+            'Colombia' => '+57',
+            'South Africa' => '+27',
+            'Egypt' => '+20',
+            'Nigeria' => '+234',
+            'Kenya' => '+254',
+            'Morocco' => '+212',
+            'Russia' => '+7',
+            'Turkey' => '+90',
+            'Saudi Arabia' => '+966',
+            'UAE' => '+971',
+            'Israel' => '+972',
+            'New Zealand' => '+64',
+            'Bangladesh' => '+880',
+            'Pakistan' => '+92',
+            'Sri Lanka' => '+94',
+            'Nepal' => '+977'
         );
     }
 }

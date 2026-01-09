@@ -173,13 +173,33 @@ class DoRegister_Ajax {
             $errors['confirm_password'] = 'Passwords do not match.';
         }
         
-        // Validate phone number: required and must match pattern (numbers, +, -, spaces, parentheses)
+        // Validate phone number: required, 10-15 digits, no letters, no spaces
         if (empty($phone_number)) {
             $errors['phone_number'] = 'Phone number is required.';
-        } elseif (!preg_match('/^[0-9+\-\s()]+$/', $phone_number)) {
-            // preg_match() uses regex to validate phone format
-            // Pattern allows: digits, +, -, spaces, and parentheses
-            $errors['phone_number'] = 'Invalid phone number format.';
+        } else {
+            // Remove + to count only digits
+            $digits_only = preg_replace('/[^0-9]/', '', $phone_number);
+            $digit_count = strlen($digits_only);
+            
+            // Check if contains letters
+            if (preg_match('/[a-zA-Z]/', $phone_number)) {
+                $errors['phone_number'] = 'Phone number cannot contain letters.';
+            }
+            // Check if contains spaces
+            elseif (preg_match('/\s/', $phone_number)) {
+                $errors['phone_number'] = 'Phone number cannot contain spaces.';
+            }
+            // Check digit count: must be between 10 and 15
+            elseif ($digit_count < 10) {
+                $errors['phone_number'] = 'Phone number must have at least 10 digits.';
+            }
+            elseif ($digit_count > 15) {
+                $errors['phone_number'] = 'Phone number cannot have more than 15 digits.';
+            }
+            // Check format: only digits and optional + at start
+            elseif (!preg_match('/^\+?[0-9]+$/', $phone_number)) {
+                $errors['phone_number'] = 'Invalid phone number format.';
+            }
         }
         
         // Validate country: required field

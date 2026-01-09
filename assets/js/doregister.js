@@ -320,18 +320,31 @@
             
             // PHONE NUMBER VALIDATION: Filter out invalid characters as user types
             // input event: Filters on every keystroke
+            // Rules: Only digits and + (for country code at start), no letters, no spaces
             $(document).on('input', '#phone_number', function() {
                 var phone = $(this).val();
                 
-                // Replace any character that's NOT a digit, +, -, space, (, or )
-                // /[^0-9+\-\s()]/g: Regex pattern
-                //   [^...]: Negated character class (NOT these characters)
-                //   0-9: Digits
-                //   +\-: Plus and hyphen (escaped)
-                //   \s: Whitespace
-                //   (): Parentheses
-                //   g: Global flag (replace all occurrences)
-                $(this).val(phone.replace(/[^0-9+\-\s()]/g, ''));
+                // Remove all non-digit characters except + at the start
+                // First, remove everything except digits and +
+                var cleaned = phone.replace(/[^0-9+]/g, '');
+                
+                // Ensure + only appears at the start (if it exists)
+                if (cleaned.indexOf('+') !== -1) {
+                    // If + exists but not at start, remove all + and add one at start
+                    if (cleaned.indexOf('+') !== 0) {
+                        cleaned = cleaned.replace(/\+/g, '');
+                        cleaned = '+' + cleaned;
+                    } else {
+                        // + is at start, but might have more + characters - remove them
+                        var hasPlus = cleaned[0] === '+';
+                        cleaned = cleaned.replace(/\+/g, '');
+                        if (hasPlus) {
+                            cleaned = '+' + cleaned;
+                        }
+                    }
+                }
+                
+                $(this).val(cleaned);
             });
             
             // INTERESTS VALIDATION: Check if at least one interest is selected
@@ -494,6 +507,36 @@
                 
                 // Clear any validation errors on the country field
                 self.clearFieldError($('.doregister-country-search'));
+                
+                // AUTO-FILL PHONE CODE: Add country phone code to phone number field
+                // Check if country phone codes are available
+                if (typeof doregisterData !== 'undefined' && doregisterData.countryPhoneCodes) {
+                    var phoneCode = doregisterData.countryPhoneCodes[country];
+                    
+                    if (phoneCode) {
+                        // Get phone number field (works for both registration and profile forms)
+                        var $phoneField = $('#phone_number, #profile_phone_number');
+                        
+                        if ($phoneField.length) {
+                            var originalValue = $phoneField.val().trim();
+                            
+                            // Remove any existing phone code from the value
+                            // Pattern: Remove leading + and digits at the start (1-4 digits for country codes)
+                            var phoneNumber = originalValue.replace(/^\+\d{1,4}/, '');
+                            
+                            // Add phone code as prefix (no space, as per validation rules)
+                            if (phoneNumber) {
+                                $phoneField.val(phoneCode + phoneNumber);
+                            } else {
+                                // If field is empty, just add the code
+                                $phoneField.val(phoneCode);
+                            }
+                            
+                            // Trigger input event to update any listeners and apply filters
+                            $phoneField.trigger('input');
+                        }
+                    }
+                }
             });
             
             // CLICK OUTSIDE: Hide dropdown when clicking outside country wrapper
@@ -1044,6 +1087,36 @@
                 var country = $(this).data('country');
                 $countryInput.val(country);
                 $dropdown.hide().empty();
+                
+                // AUTO-FILL PHONE CODE: Add country phone code to phone number field
+                // Check if country phone codes are available
+                if (typeof doregisterData !== 'undefined' && doregisterData.countryPhoneCodes) {
+                    var phoneCode = doregisterData.countryPhoneCodes[country];
+                    
+                    if (phoneCode) {
+                        // Get phone number field in profile form
+                        var $phoneField = $('#profile_phone_number');
+                        
+                        if ($phoneField.length) {
+                            var originalValue = $phoneField.val().trim();
+                            
+                            // Remove any existing phone code from the value
+                            // Pattern: Remove leading + and digits at the start (1-4 digits for country codes)
+                            var phoneNumber = originalValue.replace(/^\+\d{1,4}/, '');
+                            
+                            // Add phone code as prefix (no space, as per validation rules)
+                            if (phoneNumber) {
+                                $phoneField.val(phoneCode + phoneNumber);
+                            } else {
+                                // If field is empty, just add the code
+                                $phoneField.val(phoneCode);
+                            }
+                            
+                            // Trigger input event to update any listeners and apply filters
+                            $phoneField.trigger('input');
+                        }
+                    }
+                }
             });
             
             // Hide dropdown when clicking outside
@@ -1168,10 +1241,31 @@
             });
             
             // PHONE NUMBER VALIDATION: Filter out invalid characters as user types
+            // Rules: Only digits and + (for country code at start), no letters, no spaces
             $(document).on('input', '#profile_phone_number', function() {
                 var phone = $(this).val();
-                // Replace any character that's NOT a digit, +, -, space, (, or )
-                $(this).val(phone.replace(/[^0-9+\-\s()]/g, ''));
+                
+                // Remove all non-digit characters except + at the start
+                // First, remove everything except digits and +
+                var cleaned = phone.replace(/[^0-9+]/g, '');
+                
+                // Ensure + only appears at the start (if it exists)
+                if (cleaned.indexOf('+') !== -1) {
+                    // If + exists but not at start, remove all + and add one at start
+                    if (cleaned.indexOf('+') !== 0) {
+                        cleaned = cleaned.replace(/\+/g, '');
+                        cleaned = '+' + cleaned;
+                    } else {
+                        // + is at start, but might have more + characters - remove them
+                        var hasPlus = cleaned[0] === '+';
+                        cleaned = cleaned.replace(/\+/g, '');
+                        if (hasPlus) {
+                            cleaned = '+' + cleaned;
+                        }
+                    }
+                }
+                
+                $(this).val(cleaned);
             });
             
             // INTERESTS VALIDATION: Check if at least one interest is selected
@@ -1216,10 +1310,44 @@
                     return false;
                 }
                 
-                // PHONE NUMBER VALIDATION: Check for valid characters only
-                if (name === 'phone_number' && !/^[0-9+\-\s()]+$/.test(value)) {
-                    this.showFieldError($field, 'Please enter a valid phone number.');
-                    return false;
+                // PHONE NUMBER VALIDATION: Check for 10-15 digits, no letters, no spaces
+                // Rules:
+                // - Only digits and + (for country code at start)
+                // - Must have 10-15 digits total
+                // - No letters allowed
+                // - No spaces allowed
+                if (name === 'phone_number') {
+                    // Remove + to count only digits
+                    var digitsOnly = value.replace(/[^0-9]/g, '');
+                    var digitCount = digitsOnly.length;
+                    
+                    // Check if contains letters (shouldn't happen due to input filter, but double-check)
+                    if (/[a-zA-Z]/.test(value)) {
+                        this.showFieldError($field, 'Phone number cannot contain letters.');
+                        return false;
+                    }
+                    
+                    // Check if contains spaces (shouldn't happen due to input filter, but double-check)
+                    if (/\s/.test(value)) {
+                        this.showFieldError($field, 'Phone number cannot contain spaces.');
+                        return false;
+                    }
+                    
+                    // Check digit count: must be between 10 and 15
+                    if (digitCount < 10) {
+                        this.showFieldError($field, 'Phone number must have at least 10 digits.');
+                        return false;
+                    }
+                    if (digitCount > 15) {
+                        this.showFieldError($field, 'Phone number cannot have more than 15 digits.');
+                        return false;
+                    }
+                    
+                    // Check format: only digits and optional + at start
+                    if (!/^\+?[0-9]+$/.test(value)) {
+                        this.showFieldError($field, 'Please enter a valid phone number (digits only, + allowed at start).');
+                        return false;
+                    }
                 }
                 
                 // PASSWORD LENGTH VALIDATION: Minimum 8 characters (only if password change is enabled)
@@ -1531,15 +1659,44 @@
                     return false;
                 }
                 
-                // PHONE NUMBER VALIDATION: Check for valid characters only
-                // Regex: /^[0-9+\-\s()]+$/
-                //   ^: Start of string
-                //   [0-9+\-\s()]: Character class (digits, +, -, spaces, parentheses)
-                //   +: One or more characters
-                //   $: End of string
-                if (name === 'phone_number' && !/^[0-9+\-\s()]+$/.test(value)) {
-                    this.showFieldError($field, 'Please enter a valid phone number.');
-                    return false;
+                // PHONE NUMBER VALIDATION: Check for 10-15 digits, no letters, no spaces
+                // Rules:
+                // - Only digits and + (for country code at start)
+                // - Must have 10-15 digits total
+                // - No letters allowed
+                // - No spaces allowed
+                if (name === 'phone_number') {
+                    // Remove + to count only digits
+                    var digitsOnly = value.replace(/[^0-9]/g, '');
+                    var digitCount = digitsOnly.length;
+                    
+                    // Check if contains letters (shouldn't happen due to input filter, but double-check)
+                    if (/[a-zA-Z]/.test(value)) {
+                        this.showFieldError($field, 'Phone number cannot contain letters.');
+                        return false;
+                    }
+                    
+                    // Check if contains spaces (shouldn't happen due to input filter, but double-check)
+                    if (/\s/.test(value)) {
+                        this.showFieldError($field, 'Phone number cannot contain spaces.');
+                        return false;
+                    }
+                    
+                    // Check digit count: must be between 10 and 15
+                    if (digitCount < 10) {
+                        this.showFieldError($field, 'Phone number must have at least 10 digits.');
+                        return false;
+                    }
+                    if (digitCount > 15) {
+                        this.showFieldError($field, 'Phone number cannot have more than 15 digits.');
+                        return false;
+                    }
+                    
+                    // Check format: only digits and optional + at start
+                    if (!/^\+?[0-9]+$/.test(value)) {
+                        this.showFieldError($field, 'Please enter a valid phone number (digits only, + allowed at start).');
+                        return false;
+                    }
                 }
                 
                 // PASSWORD LENGTH VALIDATION: Minimum 8 characters
