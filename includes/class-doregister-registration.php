@@ -7,7 +7,7 @@
  * 
  * Multi-Step Form Structure:
  * - Step 1: Basic Information (name, email, password)
- * - Step 2: Contact Details (phone, country, city)
+ * - Step 2: Contact Details (country, city, phone)
  * - Step 3: Personal Details (gender, DOB, interests)
  * - Step 4: Profile Media (photo upload)
  * - Step 5: Review & Confirm (summary before submission)
@@ -243,15 +243,6 @@ class DoRegister_Registration {
                 <div class="doregister-step" data-step="2">
                     <h2>Contact Details</h2>
                     
-                    <!-- Phone Number Field -->
-                    <div class="doregister-field-group">
-                        <label for="phone_number">Phone Number <span class="required">*</span></label>
-                        <!-- type="tel": Optimized for phone number input (mobile keyboards) -->
-                        <!-- JavaScript validates numeric and length -->
-                        <input type="tel" id="phone_number" name="phone_number" class="doregister-input" required>
-                        <span class="doregister-error-message"></span>
-                    </div>
-                    
                     <!-- Country Field (Searchable Dropdown) -->
                     <div class="doregister-field-group">
                         <label for="country">Country <span class="required">*</span></label>
@@ -272,6 +263,15 @@ class DoRegister_Registration {
                         <label for="city">City</label>
                         <!-- No "required" attribute: Optional field -->
                         <input type="text" id="city" name="city" class="doregister-input">
+                        <span class="doregister-error-message"></span>
+                    </div>
+                    
+                    <!-- Phone Number Field -->
+                    <div class="doregister-field-group">
+                        <label for="phone_number">Phone Number <span class="required">*</span></label>
+                        <!-- type="tel": Optimized for phone number input (mobile keyboards) -->
+                        <!-- JavaScript validates numeric and length -->
+                        <input type="tel" id="phone_number" name="phone_number" class="doregister-input" required>
                         <span class="doregister-error-message"></span>
                     </div>
                     
