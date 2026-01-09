@@ -284,6 +284,11 @@ class DoRegister_Ajax {
      * @return void (sends JSON response and exits)
      */
     public function handle_login() {
+        // Ensure PHP session is started for user authentication
+        if (!session_id()) {
+            session_start();
+        }
+        
         // SECURITY: Verify nonce to prevent CSRF attacks
         // Different nonce action name than registration ('doregister_login' vs 'doregister_registration')
         if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'doregister_login')) {
@@ -341,19 +346,17 @@ class DoRegister_Ajax {
         
         // PERSISTENT LOGIN: Set cookies if "Remember Me" is checked
         if ($remember_me) {
-            // Generate secure token for persistent login
-            // This token is stored in database and cookie for verification
-            $token = wp_generate_password(32, false); // Generate 32-character random token
-            
-            // Store token in user meta (or we can create a separate table for tokens)
-            // For simplicity, we'll store it in a cookie and verify it matches a hash
-            // In production, you might want to store tokens in database with expiration
+            // Generate secure authentication token for persistent login
+            // Token is based on user ID, email, and WordPress AUTH_SALT
+            // This creates a deterministic but secure token that can be verified later
+            // The token changes if user data changes, providing additional security
             
             // Set cookie expiration: 30 days if "Remember Me", otherwise session cookie
             $expiration = time() + (30 * DAY_IN_SECONDS); // 30 days from now
             
             // Set secure cookies using WordPress functions
             // COOKIEPATH and COOKIE_DOMAIN are WordPress constants
+            // HttpOnly flag (true) prevents JavaScript access for security
             setcookie('doregister_user_id', $user->id, $expiration, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
             setcookie('doregister_user_token', $this->generate_auth_token($user->id, $user->email), $expiration, COOKIEPATH, COOKIE_DOMAIN, is_ssl(), true);
             
