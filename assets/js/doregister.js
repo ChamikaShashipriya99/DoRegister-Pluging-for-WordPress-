@@ -150,6 +150,18 @@
             // In jQuery callbacks, 'this' refers to the DOM element, not the DoRegister object
             var self = this;
             
+            // INITIALIZE STEP VISIBILITY: Hide all steps first, then show correct one
+            // This ensures only one step is visible on page load (normal reload or hard refresh)
+            // Fixes issue where multiple steps could be visible after page reload
+            $('.doregister-step').each(function() {
+                var $step = $(this);
+                var stepNumber = parseInt($step.data('step'), 10);
+                // Hide all steps except the one that should be active
+                if (stepNumber !== self.currentStep) {
+                    $step.removeClass('doregister-step-active slide-in-left slide-in-right').addClass('doregister-step-hidden');
+                }
+            });
+            
             // Restore form data from localStorage to form fields
             // Populates fields with previously entered values (if page was refreshed)
             this.restoreFormData();
@@ -1328,9 +1340,17 @@
             var $currentStep = $('.doregister-step[data-step="' + previousStep + '"]');
             var $targetStep = $('.doregister-step[data-step="' + step + '"]');
             
-            // HIDE CURRENT STEP: Remove active class, add hidden class
-            // CSS classes control visibility (doregister-step-active = visible, doregister-step-hidden = hidden)
-            $currentStep.removeClass('doregister-step-active slide-in-left slide-in-right').addClass('doregister-step-hidden');
+            // HIDE ALL STEPS FIRST: Ensure only one step is visible at a time
+            // This fixes the issue where multiple steps show after page refresh
+            // Find all steps that are currently visible (have doregister-step-active class)
+            $('.doregister-step.doregister-step-active').each(function() {
+                $(this).removeClass('doregister-step-active slide-in-left slide-in-right').addClass('doregister-step-hidden');
+            });
+            
+            // Also hide the step based on previousStep (for cases where it's not visible but should be cleaned up)
+            if ($currentStep.length && previousStep !== step) {
+                $currentStep.removeClass('doregister-step-active slide-in-left slide-in-right').addClass('doregister-step-hidden');
+            }
             
             // SHOW NEW STEP: Update current step and show it
             // Update internal state first
