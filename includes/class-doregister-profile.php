@@ -270,18 +270,18 @@ class DoRegister_Profile {
                                 <!-- Gender Field (Editable - Radio Buttons) -->
                                 <div class="doregister-field-group">
                                     <label>Gender</label>
-                                    <div class="doregister-radio-group">
-                                        <label class="doregister-radio-label">
+                                    <div class="doregister-radio-group doregister-gender-group">
+                                        <label class="doregister-radio-label doregister-gender-card">
                                             <input type="radio" name="gender" value="male" class="doregister-radio" <?php checked($user->gender, 'male'); ?>>
-                                            <span>Male</span>
+                                            <span><span class="doregister-gender-emoji">👨</span><span class="doregister-gender-text">Male</span></span>
                                         </label>
-                                        <label class="doregister-radio-label">
+                                        <label class="doregister-radio-label doregister-gender-card">
                                             <input type="radio" name="gender" value="female" class="doregister-radio" <?php checked($user->gender, 'female'); ?>>
-                                            <span>Female</span>
+                                            <span><span class="doregister-gender-emoji">👩</span><span class="doregister-gender-text">Female</span></span>
                                         </label>
-                                        <label class="doregister-radio-label">
+                                        <label class="doregister-radio-label doregister-gender-card">
                                             <input type="radio" name="gender" value="other" class="doregister-radio" <?php checked($user->gender, 'other'); ?>>
-                                            <span>Other</span>
+                                            <span><span class="doregister-gender-emoji">🌈</span><span class="doregister-gender-text">Other</span></span>
                                         </label>
                                     </div>
                                     <span class="doregister-error-message"></span>
@@ -297,15 +297,42 @@ class DoRegister_Profile {
                                 <!-- Interests Field (Editable - Checkboxes) -->
                                 <div class="doregister-field-group">
                                     <label>Interests <span class="required">*</span></label>
-                                    <div class="doregister-checkbox-group">
+                                    <div class="doregister-checkbox-group doregister-interests-group">
                                         <?php
                                         $available_interests = array('technology', 'sports', 'music', 'travel', 'reading', 'cooking');
                                         $user_interests = is_array($user->interests) ? $user->interests : array();
                                         foreach ($available_interests as $interest):
+                                            // Map each interest to an emoji
+                                            $emoji = '';
+                                            switch ($interest) {
+                                                case 'technology':
+                                                    $emoji = '💻';
+                                                    break;
+                                                case 'sports':
+                                                    $emoji = '⚽';
+                                                    break;
+                                                case 'music':
+                                                    $emoji = '🎵';
+                                                    break;
+                                                case 'travel':
+                                                    $emoji = '✈️';
+                                                    break;
+                                                case 'reading':
+                                                    $emoji = '📚';
+                                                    break;
+                                                case 'cooking':
+                                                    $emoji = '🍳';
+                                                    break;
+                                                default:
+                                                    $emoji = '⭐';
+                                            }
                                         ?>
-                                        <label class="doregister-checkbox-label">
+                                        <label class="doregister-checkbox-label doregister-interest-card">
                                             <input type="checkbox" name="interests[]" value="<?php echo esc_attr($interest); ?>" class="doregister-checkbox" <?php checked(in_array($interest, $user_interests)); ?>>
-                                            <span><?php echo esc_html(ucfirst($interest)); ?></span>
+                                            <span>
+                                                <span class="doregister-interest-emoji"><?php echo esc_html($emoji); ?></span>
+                                                <span class="doregister-interest-text"><?php echo esc_html(ucfirst($interest)); ?></span>
+                                            </span>
                                         </label>
                                         <?php endforeach; ?>
                                     </div>

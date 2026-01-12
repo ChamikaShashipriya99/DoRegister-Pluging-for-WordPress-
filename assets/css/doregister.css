@@ -775,6 +775,141 @@ input[type="date"].doregister-input.doregister-input-error:hover {
 }
 
 /**
+ * Gender Radio Cards
+ *
+ * Styles the gender radio buttons as selectable cards with emojis.
+ * Applies to registration and profile forms using .doregister-gender-card.
+ *
+ * Structure:
+ * <label class="doregister-radio-label doregister-gender-card">
+ *   <input type="radio" ...>
+ *   <span>
+ *     <span class="doregister-gender-emoji">👨</span>
+ *     <span class="doregister-gender-text">Male</span>
+ *   </span>
+ * </label>
+ */
+.doregister-gender-group {
+    gap: 12px; /* Slightly tighter spacing between cards */
+}
+
+.doregister-gender-card {
+    position: relative; /* For input positioning */
+}
+
+.doregister-gender-card input[type="radio"] {
+    position: absolute;
+    opacity: 0; /* Hide native radio, keep accessible */
+}
+
+.doregister-gender-card > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    background: #fafafa;
+    color: #333;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+    min-width: 110px;
+    justify-content: center;
+}
+
+.doregister-gender-card:hover > span {
+    border-color: #4CAF50;
+    background: #f3fbf5;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.15);
+    transform: translateY(-1px);
+}
+
+.doregister-gender-card input[type="radio"]:focus-visible + span {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+.doregister-gender-card input[type="radio"]:checked + span {
+    border-color: #4CAF50;
+    background: #e8f5e9;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.25);
+    transform: translateY(-1px);
+}
+
+.doregister-gender-emoji {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.doregister-gender-text {
+    font-size: 14px;
+}
+
+/**
+ * Interest Checkbox Cards
+ *
+ * Styles the interests checkboxes as selectable cards with emojis.
+ * Applies to registration and profile forms using .doregister-interest-card.
+ */
+.doregister-interests-group {
+    gap: 12px; /* Similar spacing to gender cards */
+}
+
+.doregister-interest-card {
+    position: relative; /* For input positioning */
+}
+
+.doregister-interest-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0; /* Hide native checkbox, keep accessible */
+}
+
+.doregister-interest-card > span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 2px solid #e0e0e0;
+    background: #fafafa;
+    color: #333;
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+    min-width: 130px;
+    justify-content: center;
+}
+
+.doregister-interest-card:hover > span {
+    border-color: #4CAF50;
+    background: #f3fbf5;
+    box-shadow: 0 2px 6px rgba(76, 175, 80, 0.15);
+    transform: translateY(-1px);
+}
+
+.doregister-interest-card input[type="checkbox"]:focus-visible + span {
+    outline: 2px solid #4CAF50;
+    outline-offset: 2px;
+}
+
+.doregister-interest-card input[type="checkbox"]:checked + span {
+    border-color: #4CAF50;
+    background: #e8f5e9;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.25);
+    transform: translateY(-1px);
+}
+
+.doregister-interest-emoji {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.doregister-interest-text {
+    font-size: 14px;
+}
+
+/**
  * Remember Me Label
  * 
  * Special styling for "Remember Me" checkbox in login form.

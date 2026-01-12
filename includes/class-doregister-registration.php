@@ -314,25 +314,26 @@ class DoRegister_Registration {
                     
                     <!-- Gender Field (Radio Buttons) -->
                     <div class="doregister-field-group">
-                        <label>Gender</label>
+                        <label>Gender <span class="required">*</span></label>
                         <!-- Radio Group Container -->
-                        <div class="doregister-radio-group">
+                        <div class="doregister-radio-group doregister-gender-group">
                             <!-- Radio Option: Male -->
                             <!-- name="gender": All radio buttons share same name (only one can be selected) -->
                             <!-- value="male": Value sent to server if selected -->
-                            <label class="doregister-radio-label">
-                                <input type="radio" name="gender" value="male" class="doregister-radio">
-                                <span>Male</span>
+                            <!-- required: At least one radio button must be selected -->
+                            <label class="doregister-radio-label doregister-gender-card">
+                                <input type="radio" name="gender" value="male" class="doregister-radio" required>
+                                <span><span class="doregister-gender-emoji">👨</span><span class="doregister-gender-text">Male</span></span>
                             </label>
                             <!-- Radio Option: Female -->
-                            <label class="doregister-radio-label">
-                                <input type="radio" name="gender" value="female" class="doregister-radio">
-                                <span>Female</span>
+                            <label class="doregister-radio-label doregister-gender-card">
+                                <input type="radio" name="gender" value="female" class="doregister-radio" required>
+                                <span><span class="doregister-gender-emoji">👩</span><span class="doregister-gender-text">Female</span></span>
                             </label>
                             <!-- Radio Option: Other -->
-                            <label class="doregister-radio-label">
-                                <input type="radio" name="gender" value="other" class="doregister-radio">
-                                <span>Other</span>
+                            <label class="doregister-radio-label doregister-gender-card">
+                                <input type="radio" name="gender" value="other" class="doregister-radio" required>
+                                <span><span class="doregister-gender-emoji">🌈</span><span class="doregister-gender-text">Other</span></span>
                             </label>
                         </div>
                         <span class="doregister-error-message"></span>
@@ -351,38 +352,38 @@ class DoRegister_Registration {
                     <div class="doregister-field-group">
                         <label>Interests <span class="required">*</span></label>
                         <!-- Checkbox Group Container -->
-                        <div class="doregister-checkbox-group">
+                        <div class="doregister-checkbox-group doregister-interests-group">
                             <!-- Checkbox Option: Technology -->
                             <!-- name="interests[]": Array notation - multiple values can be selected -->
                             <!-- [] in name: PHP receives as array $_POST['interests'] -->
-                            <label class="doregister-checkbox-label">
+                            <label class="doregister-checkbox-label doregister-interest-card">
                                 <input type="checkbox" name="interests[]" value="technology" class="doregister-checkbox">
-                                <span>Technology</span>
+                                <span><span class="doregister-interest-emoji">💻</span><span class="doregister-interest-text">Technology</span></span>
                             </label>
                             <!-- Checkbox Option: Sports -->
-                            <label class="doregister-checkbox-label">
+                            <label class="doregister-checkbox-label doregister-interest-card">
                                 <input type="checkbox" name="interests[]" value="sports" class="doregister-checkbox">
-                                <span>Sports</span>
+                                <span><span class="doregister-interest-emoji">⚽</span><span class="doregister-interest-text">Sports</span></span>
                             </label>
                             <!-- Checkbox Option: Music -->
-                            <label class="doregister-checkbox-label">
+                            <label class="doregister-checkbox-label doregister-interest-card">
                                 <input type="checkbox" name="interests[]" value="music" class="doregister-checkbox">
-                                <span>Music</span>
+                                <span><span class="doregister-interest-emoji">🎵</span><span class="doregister-interest-text">Music</span></span>
                             </label>
                             <!-- Checkbox Option: Travel -->
-                            <label class="doregister-checkbox-label">
+                            <label class="doregister-checkbox-label doregister-interest-card">
                                 <input type="checkbox" name="interests[]" value="travel" class="doregister-checkbox">
-                                <span>Travel</span>
+                                <span><span class="doregister-interest-emoji">✈️</span><span class="doregister-interest-text">Travel</span></span>
                             </label>
                             <!-- Checkbox Option: Reading -->
-                            <label class="doregister-checkbox-label">
+                            <label class="doregister-checkbox-label doregister-interest-card">
                                 <input type="checkbox" name="interests[]" value="reading" class="doregister-checkbox">
-                                <span>Reading</span>
+                                <span><span class="doregister-interest-emoji">📚</span><span class="doregister-interest-text">Reading</span></span>
                             </label>
                             <!-- Checkbox Option: Cooking -->
-                            <label class="doregister-checkbox-label">
+                            <label class="doregister-checkbox-label doregister-interest-card">
                                 <input type="checkbox" name="interests[]" value="cooking" class="doregister-checkbox">
-                                <span>Cooking</span>
+                                <span><span class="doregister-interest-emoji">🍳</span><span class="doregister-interest-text">Cooking</span></span>
                             </label>
                         </div>
                         <!-- JavaScript validates at least 3 interests selected -->

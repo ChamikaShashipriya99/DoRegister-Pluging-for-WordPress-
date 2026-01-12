@@ -1622,6 +1622,16 @@
                     }
                 }
             } else if (step === 3) {
+                // STEP 3: Gender validation
+                // Must select a gender option
+                var genderSelected = $('input[name="gender"]:checked').length > 0;
+                if (!genderSelected) {
+                    // Find the gender field group and show error
+                    var $genderField = $('input[name="gender"]').first().closest('.doregister-field-group');
+                    self.showFieldError($genderField.find('input[name="gender"]').first(), 'Gender is required.');
+                    isValid = false;
+                }
+                
                 // STEP 3: Interests validation
                 // Must select at least one interest checkbox
                 if (!self.validateInterests()) {
@@ -1695,6 +1705,19 @@
                 // .trim(): Removes leading/trailing whitespace
                 this.showFieldError($field, 'This field is required.');
                 return false; // Validation failed
+            }
+            
+            // RADIO BUTTON VALIDATION: Check if at least one radio button in group is selected
+            if (type === 'radio' && required) {
+                // For radio buttons, check if any in the group is selected
+                var radioGroupName = $field.attr('name');
+                var radioSelected = $('input[name="' + radioGroupName + '"]:checked').length > 0;
+                if (!radioSelected) {
+                    // Show error on the first radio button in the group
+                    var $firstRadio = $('input[name="' + radioGroupName + '"]').first();
+                    this.showFieldError($firstRadio, 'This field is required.');
+                    return false;
+                }
             }
             
             // TYPE-SPECIFIC VALIDATION: Only validate if field has a value
@@ -2399,10 +2422,8 @@
                 html += '<div class="doregister-review-item"><strong>City:</strong> ' + self.escapeHtml(this.formData.city) + '</div>';
             }
             
-            // Gender (optional)
-            if (this.formData.gender) {
-                html += '<div class="doregister-review-item"><strong>Gender:</strong> ' + self.escapeHtml(this.formData.gender) + '</div>';
-            }
+            // Gender (required)
+            html += '<div class="doregister-review-item"><strong>Gender:</strong> ' + self.escapeHtml(this.formData.gender || 'Not specified') + '</div>';
             
             // Date of Birth (optional)
             if (this.formData.date_of_birth) {
@@ -2494,7 +2515,7 @@
                 phone_number: this.formData.phone_number,
                 country: this.formData.country,
                 city: this.formData.city || '', // Optional: Default to empty string
-                gender: this.formData.gender || '', // Optional: Default to empty string
+                gender: this.formData.gender || '', // Required: Default to empty string
                 date_of_birth: this.formData.date_of_birth || '', // Optional: Default to empty string
                 interests: this.formData['interests[]'] || this.formData.interests || [], // Handle both array notations
                 profile_photo: this.formData.profile_photo || '' // Optional: Default to empty string

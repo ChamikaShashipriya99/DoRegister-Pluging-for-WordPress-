@@ -136,7 +136,7 @@ class DoRegister_Ajax {
         $phone_number = sanitize_text_field($_POST['phone_number'] ?? ''); // Phone number
         $country = sanitize_text_field($_POST['country'] ?? ''); // Selected country
         $city = sanitize_text_field($_POST['city'] ?? ''); // City (optional field)
-        $gender = sanitize_text_field($_POST['gender'] ?? ''); // Gender (optional: male/female/other)
+        $gender = sanitize_text_field($_POST['gender'] ?? ''); // Gender (required: male/female/other)
         $date_of_birth = sanitize_text_field($_POST['date_of_birth'] ?? ''); // Date of birth (optional)
         // Interests is an array (checkboxes), so we map sanitize_text_field to each value
         $interests = isset($_POST['interests']) ? array_map('sanitize_text_field', $_POST['interests']) : array();
