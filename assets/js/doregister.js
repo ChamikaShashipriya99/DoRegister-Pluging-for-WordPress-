@@ -1357,6 +1357,15 @@
                         return false;
                     }
                 }
+                
+                // DATE OF BIRTH VALIDATION: Future date, minimum age, maximum age
+                if ((name === 'date_of_birth' || name === 'profile_date_of_birth') && type === 'date') {
+                    var validationResult = this.validateDateOfBirth(value);
+                    if (!validationResult.isValid) {
+                        this.showFieldError($field, validationResult.message);
+                        return false;
+                    }
+                }
             }
             
             // All validations passed
@@ -1590,6 +1599,16 @@
                 if (!self.validateInterests()) {
                     isValid = false;
                 }
+                
+                // DATE OF BIRTH VALIDATION: Validate if date is provided (optional field)
+                var $dateOfBirth = $('#date_of_birth');
+                if ($dateOfBirth.length && $dateOfBirth.val()) {
+                    var dateValidation = self.validateDateOfBirth($dateOfBirth.val());
+                    if (!dateValidation.isValid) {
+                        self.showFieldError($dateOfBirth, dateValidation.message);
+                        isValid = false;
+                    }
+                }
             } else if (step === 4) {
                 // STEP 4: Profile photo validation
                 var $photoField = $('#profile_photo');
@@ -1704,10 +1723,75 @@
                     this.showFieldError($field, 'Password must be at least 8 characters.');
                     return false;
                 }
+                
+                // DATE OF BIRTH VALIDATION: Future date, minimum age, maximum age
+                if ((name === 'date_of_birth' || name === 'profile_date_of_birth') && type === 'date') {
+                    var validationResult = this.validateDateOfBirth(value);
+                    if (!validationResult.isValid) {
+                        this.showFieldError($field, validationResult.message);
+                        return false;
+                    }
+                }
             }
             
             // All validations passed
             return true;
+        },
+        
+        /**
+         * Validate date of birth
+         * 
+         * Validates that the date of birth:
+         * - Is not in the future
+         * - User is at least 18 years old (minimum age rule)
+         * - User is not more than 100 years old (reasonable maximum)
+         * 
+         * @method validateDateOfBirth
+         * @param {string} dateString - Date string in YYYY-MM-DD format
+         * @returns {object} Object with isValid (boolean) and message (string) properties
+         */
+        validateDateOfBirth: function(dateString) {
+            if (!dateString) {
+                // Empty date is valid (field is optional)
+                return { isValid: true, message: '' };
+            }
+            
+            var birthDate = new Date(dateString);
+            var today = new Date();
+            today.setHours(0, 0, 0, 0); // Reset time to midnight for accurate date comparison
+            
+            // Check if date is valid
+            if (isNaN(birthDate.getTime())) {
+                return { isValid: false, message: 'Please enter a valid date.' };
+            }
+            
+            // FUTURE DATE CHECK: Date of birth cannot be in the future
+            if (birthDate > today) {
+                return { isValid: false, message: 'Date of birth cannot be in the future.' };
+            }
+            
+            // Calculate age
+            var age = today.getFullYear() - birthDate.getFullYear();
+            var monthDiff = today.getMonth() - birthDate.getMonth();
+            var dayDiff = today.getDate() - birthDate.getDate();
+            
+            // Adjust age if birthday hasn't occurred this year
+            if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+                age--;
+            }
+            
+            // MINIMUM AGE CHECK: User must be at least 18 years old
+            if (age < 18) {
+                return { isValid: false, message: 'You must be at least 18 years old to register.' };
+            }
+            
+            // MAXIMUM AGE CHECK: User cannot be more than 100 years old
+            if (age > 100) {
+                return { isValid: false, message: 'Please enter a valid date of birth.' };
+            }
+            
+            // All validations passed
+            return { isValid: true, message: '' };
         },
         
         /**

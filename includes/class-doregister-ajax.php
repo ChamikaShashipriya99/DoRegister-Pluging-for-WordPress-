@@ -212,6 +212,14 @@ class DoRegister_Ajax {
             $errors['interests'] = 'Please select at least one interest.';
         }
         
+        // Validate date of birth: optional field, but if provided must be valid
+        if (!empty($date_of_birth)) {
+            $date_validation = $this->validate_date_of_birth($date_of_birth);
+            if (!$date_validation['is_valid']) {
+                $errors['date_of_birth'] = $date_validation['message'];
+            }
+        }
+        
         // Validate profile photo: required (must be uploaded)
         if (empty($profile_photo)) {
             $errors['profile_photo'] = 'Profile photo is required.';
@@ -771,6 +779,14 @@ class DoRegister_Ajax {
             $errors['interests'] = 'Please select at least one interest.';
         }
         
+        // Validate date of birth: optional field, but if provided must be valid
+        if (!empty($date_of_birth)) {
+            $date_validation = $this->validate_date_of_birth($date_of_birth);
+            if (!$date_validation['is_valid']) {
+                $errors['date_of_birth'] = $date_validation['message'];
+            }
+        }
+        
         // If validation errors exist, return them to frontend
         if (!empty($errors)) {
             wp_send_json_error(array('errors' => $errors, 'message' => 'Please fix the errors below.'));
@@ -834,6 +850,70 @@ class DoRegister_Ajax {
             // Send error response to frontend
             wp_send_json_error(array('message' => $error_message));
         }
+    }
+    
+    /**
+     * Validate date of birth
+     * 
+     * Validates that the date of birth:
+     * - Is not in the future
+     * - User is at least 18 years old (minimum age rule)
+     * - User is not more than 100 years old (reasonable maximum)
+     * 
+     * @since 1.0.0
+     * @param string $date_string Date string in YYYY-MM-DD format
+     * @return array Array with 'is_valid' (boolean) and 'message' (string) keys
+     */
+    private function validate_date_of_birth($date_string) {
+        if (empty($date_string)) {
+            // Empty date is valid (field is optional)
+            return array('is_valid' => true, 'message' => '');
+        }
+        
+        // Parse date string
+        $birth_date = strtotime($date_string);
+        
+        // Check if date is valid
+        if ($birth_date === false) {
+            return array('is_valid' => false, 'message' => 'Please enter a valid date.');
+        }
+        
+        $today = strtotime('today'); // Get today's date at midnight
+        $birth_timestamp = $birth_date;
+        
+        // FUTURE DATE CHECK: Date of birth cannot be in the future
+        if ($birth_timestamp > $today) {
+            return array('is_valid' => false, 'message' => 'Date of birth cannot be in the future.');
+        }
+        
+        // Calculate age
+        $birth_year = (int) date('Y', $birth_timestamp);
+        $birth_month = (int) date('m', $birth_timestamp);
+        $birth_day = (int) date('d', $birth_timestamp);
+        
+        $today_year = (int) date('Y', $today);
+        $today_month = (int) date('m', $today);
+        $today_day = (int) date('d', $today);
+        
+        $age = $today_year - $birth_year;
+        
+        // Adjust age if birthday hasn't occurred this year
+        if ($today_month < $birth_month || ($today_month === $birth_month && $today_day < $birth_day)) {
+            $age--;
+        }
+        
+        // MINIMUM AGE CHECK: User must be at least 18 years old
+        if ($age < 18) {
+            return array('is_valid' => false, 'message' => 'You must be at least 18 years old to register.');
+        }
+        
+        // MAXIMUM AGE CHECK: User cannot be more than 100 years old
+        if ($age > 100) {
+            return array('is_valid' => false, 'message' => 'Please enter a valid date of birth.');
+        }
+        
+        // All validations passed
+        return array('is_valid' => true, 'message' => '');
     }
 }
 

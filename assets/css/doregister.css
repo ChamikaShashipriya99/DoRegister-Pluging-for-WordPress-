@@ -412,6 +412,120 @@
 }
 
 /**
+ * Date Input / Calendar Styling
+ * 
+ * Enhanced styling for HTML5 date input fields (calendar picker).
+ * Provides modern, polished appearance with custom calendar icon styling.
+ * 
+ * Design Intent:
+ * - Custom calendar icon appearance
+ * - Smooth transitions and hover effects
+ * - Enhanced focus states
+ * - Cross-browser compatibility
+ */
+input[type="date"].doregister-input {
+    position: relative;
+    cursor: pointer;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px 20px;
+    padding-right: 45px; /* Extra padding for calendar icon */
+    color: #333;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+input[type="date"].doregister-input:hover {
+    border-color: #4CAF50;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.15);
+    transform: translateY(-1px);
+}
+
+input[type="date"].doregister-input:focus {
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1), 0 4px 12px rgba(76, 175, 80, 0.15);
+    transform: translateY(-1px);
+}
+
+input[type="date"].doregister-input::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+input[type="date"].doregister-input::-webkit-inner-spin-button,
+input[type="date"].doregister-input::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
+/* Firefox date input styling */
+input[type="date"].doregister-input::-moz-focus-inner {
+    border: 0;
+}
+
+input[type="date"].doregister-input::-moz-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+/* Calendar popup styling (WebKit browsers) */
+input[type="date"].doregister-input::-webkit-datetime-edit {
+    padding: 0;
+    color: #333;
+}
+
+input[type="date"].doregister-input::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+input[type="date"].doregister-input::-webkit-datetime-edit-text {
+    color: #666;
+    padding: 0 4px;
+}
+
+input[type="date"].doregister-input::-webkit-datetime-edit-month-field,
+input[type="date"].doregister-input::-webkit-datetime-edit-day-field,
+input[type="date"].doregister-input::-webkit-datetime-edit-year-field {
+    color: #333;
+    padding: 0 2px;
+    font-weight: 500;
+}
+
+input[type="date"].doregister-input::-webkit-datetime-edit-month-field:focus,
+input[type="date"].doregister-input::-webkit-datetime-edit-day-field:focus,
+input[type="date"].doregister-input::-webkit-datetime-edit-year-field:focus {
+    background-color: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border-radius: 3px;
+    outline: none;
+}
+
+/* Error state for date input */
+input[type="date"].doregister-input.doregister-input-error {
+    border-color: #e74c3c;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+input[type="date"].doregister-input.doregister-input-error:hover {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15), 0 4px 8px rgba(231, 76, 60, 0.15);
+}
+
+/**
  * File Input Override
  * 
  * Special styling for file input fields. File inputs have different
@@ -2376,22 +2490,73 @@
  */
 .doregister-profile-edit-mode input[type="date"] {
     width: 100%; /* Full width */
-    padding: 12px 15px; /* Comfortable padding */
+    padding: 12px 45px 12px 15px; /* Extra padding on right for calendar icon */
     border: 2px solid #ddd; /* Light gray border */
     border-radius: 5px; /* Rounded corners */
     font-size: 14px; /* Standard readable size */
-    transition: border-color 0.3s ease; /* Smooth border transition */
+    transition: all 0.3s ease; /* Smooth transitions */
     box-sizing: border-box; /* Includes padding/border in width */
     font-family: inherit; /* Inherits font family */
+    cursor: pointer;
+    background-color: #fff;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%234CAF50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 20px 20px;
+    color: #333;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.doregister-profile-edit-mode input[type="date"]:hover {
+    border-color: #4CAF50;
+    box-shadow: 0 4px 8px rgba(76, 175, 80, 0.15);
+    transform: translateY(-1px);
 }
 
 .doregister-profile-edit-mode input[type="date"]:focus {
     outline: none; /* Removes default browser outline */
     border-color: #4CAF50; /* Green border on focus */
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1), 0 4px 12px rgba(76, 175, 80, 0.15);
+    transform: translateY(-1px);
 }
 
 .doregister-profile-edit-mode input[type="date"].doregister-input-error {
     border-color: #e74c3c; /* Red border for error state */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23e74c3c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.doregister-profile-edit-mode input[type="date"].doregister-input-error:hover {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.15), 0 4px 8px rgba(231, 76, 60, 0.15);
+}
+
+/* Calendar picker indicator styling for profile edit mode */
+.doregister-profile-edit-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+}
+
+.doregister-profile-edit-mode input[type="date"]::-webkit-inner-spin-button,
+.doregister-profile-edit-mode input[type="date"]::-webkit-clear-button {
+    display: none;
+    -webkit-appearance: none;
+}
+
+.doregister-profile-edit-mode input[type="date"]::-moz-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0;
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
 }
 
 /**
