@@ -363,6 +363,30 @@ class DoRegister_Profile {
                                                 <span class="doregister-password-toggle-icon">👁️</span>
                                             </button>
                                         </div>
+                                        <!-- Password Requirements Checklist -->
+                                        <div class="doregister-password-requirements">
+                                            <div class="doregister-password-requirement" data-requirement="length">
+                                                <span class="doregister-requirement-icon">✗</span>
+                                                <span class="doregister-requirement-text">At least 8 characters</span>
+                                            </div>
+                                            <div class="doregister-password-requirement" data-requirement="uppercase">
+                                                <span class="doregister-requirement-icon">✗</span>
+                                                <span class="doregister-requirement-text">One capital letter</span>
+                                            </div>
+                                            <div class="doregister-password-requirement" data-requirement="lowercase">
+                                                <span class="doregister-requirement-icon">✗</span>
+                                                <span class="doregister-requirement-text">One lowercase letter</span>
+                                            </div>
+                                            <div class="doregister-password-requirement" data-requirement="number">
+                                                <span class="doregister-requirement-icon">✗</span>
+                                                <span class="doregister-requirement-text">One number</span>
+                                            </div>
+                                            <div class="doregister-password-requirement" data-requirement="special">
+                                                <span class="doregister-requirement-icon">✗</span>
+                                                <span class="doregister-requirement-text">One special character</span>
+                                            </div>
+                                        </div>
+                                        <!-- Password strength meter container (populated by JavaScript) -->
                                         <div class="doregister-password-strength"></div>
                                         <span class="doregister-error-message"></span>
                                     </div>

@@ -1105,6 +1105,78 @@ input[type="date"].doregister-input.doregister-input-error:hover {
     color: #27ae60; /* Green (success color, indicates strong password) */
 }
 
+/**
+ * Password Requirements Checklist
+ * 
+ * Visual checklist showing password requirements with checkmarks/X marks.
+ * Hidden by default, shown when user starts typing password.
+ * 
+ * Design Intent:
+ * - Small font (12px) - Secondary information
+ * - List-style layout - Easy to scan
+ * - Color-coded icons - Green checkmark when met, red X when not met
+ * - Smooth transitions - Visual feedback as requirements are met
+ */
+.doregister-password-requirements {
+    margin-top: 8px; /* Spacing from password input */
+    font-size: 12px; /* Smaller font (secondary information) */
+    opacity: 0; /* Hidden by default */
+    max-height: 0; /* Collapsed by default */
+    overflow: hidden; /* Hide content when collapsed */
+    transition: opacity 0.3s ease, max-height 0.3s ease; /* Smooth fade-in animation */
+}
+
+.doregister-password-requirements.doregister-visible {
+    opacity: 1; /* Fully visible when password is entered */
+    max-height: 200px; /* Expand to show all requirements */
+}
+
+.doregister-password-requirement {
+    display: flex; /* Flexbox for icon and text alignment */
+    align-items: center; /* Vertically center icon with text */
+    margin-bottom: 4px; /* Small spacing between requirements */
+    color: #666; /* Gray text color */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.doregister-password-requirement:last-child {
+    margin-bottom: 0; /* No margin on last item */
+}
+
+.doregister-requirement-icon {
+    display: inline-block; /* Allows width/height */
+    width: 16px; /* Icon size */
+    height: 16px; /* Icon size */
+    margin-right: 6px; /* Spacing between icon and text */
+    font-size: 14px; /* Slightly larger icon */
+    font-weight: bold; /* Bold icon for visibility */
+    color: #e74c3c; /* Red X by default (requirement not met) */
+    transition: color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.doregister-password-requirement.doregister-requirement-met .doregister-requirement-icon {
+    color: #27ae60; /* Green checkmark when requirement is met */
+    transform: scale(1.1); /* Slight scale increase for emphasis */
+}
+
+.doregister-password-requirement.doregister-requirement-met {
+    color: #333; /* Darker text when requirement is met */
+}
+
+.doregister-requirement-text {
+    flex: 1; /* Take remaining space */
+}
+
+/* Update icon content dynamically */
+.doregister-password-requirement.doregister-requirement-met .doregister-requirement-icon::before {
+    content: '✓'; /* Checkmark when met */
+}
+
+.doregister-password-requirement:not(.doregister-requirement-met) .doregister-requirement-icon::before {
+    content: '✗'; /* X mark when not met */
+}
+
 /* ==========================================================================
    COMPONENTS: Image Preview
    ========================================================================== */
@@ -2575,6 +2647,59 @@ input[type="date"].doregister-input.doregister-input-error:hover {
 
 .doregister-profile-edit-mode .doregister-error-message.doregister-error-visible {
     display: block; /* Show error message */
+}
+
+/**
+ * Profile Edit Form Password Requirements
+ * 
+ * Password requirements checklist styling in profile edit form.
+ * Reuses registration form password requirements styles.
+ */
+.doregister-profile-edit-mode .doregister-password-requirements {
+    margin-top: 8px; /* Spacing from password input */
+    font-size: 12px; /* Smaller font (secondary information) */
+    opacity: 0; /* Hidden by default */
+    max-height: 0; /* Collapsed by default */
+    overflow: hidden; /* Hide content when collapsed */
+    transition: opacity 0.3s ease, max-height 0.3s ease; /* Smooth fade-in animation */
+}
+
+.doregister-profile-edit-mode .doregister-password-requirements.doregister-visible {
+    opacity: 1; /* Fully visible when password is entered */
+    max-height: 200px; /* Expand to show all requirements */
+}
+
+.doregister-profile-edit-mode .doregister-password-requirement {
+    display: flex; /* Flexbox for icon and text alignment */
+    align-items: center; /* Vertically center icon with text */
+    margin-bottom: 4px; /* Small spacing between requirements */
+    color: #666; /* Gray text color */
+    transition: color 0.3s ease; /* Smooth color transition */
+}
+
+.doregister-profile-edit-mode .doregister-password-requirement:last-child {
+    margin-bottom: 0; /* No margin on last item */
+}
+
+.doregister-profile-edit-mode .doregister-requirement-icon {
+    display: inline-block; /* Allows width/height */
+    width: 16px; /* Icon size */
+    height: 16px; /* Icon size */
+    margin-right: 6px; /* Spacing between icon and text */
+    font-size: 14px; /* Slightly larger icon */
+    font-weight: bold; /* Bold icon for visibility */
+    color: #e74c3c; /* Red X by default (requirement not met) */
+    transition: color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+    flex-shrink: 0; /* Prevent icon from shrinking */
+}
+
+.doregister-profile-edit-mode .doregister-password-requirement.doregister-requirement-met .doregister-requirement-icon {
+    color: #27ae60; /* Green checkmark when requirement is met */
+    transform: scale(1.1); /* Slight scale increase for emphasis */
+}
+
+.doregister-profile-edit-mode .doregister-password-requirement.doregister-requirement-met {
+    color: #333; /* Darker text when requirement is met */
 }
 
 /**

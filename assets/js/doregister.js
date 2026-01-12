@@ -1350,10 +1350,11 @@
                     }
                 }
                 
-                // PASSWORD LENGTH VALIDATION: Minimum 8 characters (only if password change is enabled)
-                if (name === 'password' && $('#change_password_toggle').is(':checked')) {
-                    if (value.length < 8) {
-                        this.showFieldError($field, 'Password must be at least 8 characters.');
+                // PASSWORD VALIDATION: Check all requirements (only if password change is enabled)
+                if ((name === 'password' || name === 'profile_password') && $('#change_password_toggle').is(':checked')) {
+                    var passwordValidation = this.validatePasswordRequirements(value);
+                    if (!passwordValidation.isValid) {
+                        this.showFieldError($field, passwordValidation.message);
                         return false;
                     }
                 }
@@ -1414,25 +1415,49 @@
          * @returns {void}
          */
         checkProfilePasswordStrength: function(password, $field) {
-            // Find the strength meter within the same field group
             var $meter = $field.closest('.doregister-field-group').find('.doregister-password-strength');
+            var $requirements = $field.closest('.doregister-field-group').find('.doregister-password-requirements');
+            
+            // Check individual requirements
+            var hasLength = password.length >= 8;
+            var hasUppercase = password.match(/[A-Z]/) !== null;
+            var hasLowercase = password.match(/[a-z]/) !== null;
+            var hasNumber = password.match(/\d/) !== null;
+            var hasSpecial = password.match(/[^a-zA-Z\d]/) !== null;
+            
+            // Update requirement indicators
+            if ($requirements.length > 0) {
+                $requirements.find('[data-requirement="length"]').toggleClass('doregister-requirement-met', hasLength);
+                $requirements.find('[data-requirement="uppercase"]').toggleClass('doregister-requirement-met', hasUppercase);
+                $requirements.find('[data-requirement="lowercase"]').toggleClass('doregister-requirement-met', hasLowercase);
+                $requirements.find('[data-requirement="number"]').toggleClass('doregister-requirement-met', hasNumber);
+                $requirements.find('[data-requirement="special"]').toggleClass('doregister-requirement-met', hasSpecial);
+                
+                // Show/hide requirements list
+                if (password.length === 0) {
+                    $requirements.removeClass('doregister-visible');
+                } else {
+                    $requirements.addClass('doregister-visible');
+                }
+            }
+            
+            // Calculate overall strength
             var strength = 0;
+            if (hasLength) strength++;
+            if (hasUppercase) strength++;
+            if (hasLowercase) strength++;
+            if (hasNumber) strength++;
+            if (hasSpecial) strength++;
             
-            if (password.length >= 8) strength++;
-            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
-            if (password.match(/\d/)) strength++;
-            if (password.match(/[^a-zA-Z\d]/)) strength++;
-            
+            // Update strength meter
             $meter.removeClass('doregister-weak doregister-medium doregister-strong');
             
             if (password.length === 0) {
                 $meter.text('').removeClass('doregister-visible');
-            } else if (strength <= 2) {
-                $meter.text('Weak').addClass('doregister-weak doregister-visible');
-            } else if (strength === 3) {
-                $meter.text('Medium').addClass('doregister-medium doregister-visible');
+            } else if (strength < 5) {
+                $meter.text('Password requirements not met').addClass('doregister-weak doregister-visible');
             } else {
-                $meter.text('Strong').addClass('doregister-strong doregister-visible');
+                $meter.text('Strong password').addClass('doregister-strong doregister-visible');
             }
         },
         
@@ -1588,10 +1613,13 @@
                     isValid = false;
                 }
                 
-                // PASSWORD LENGTH: Minimum 8 characters
-                if (password && password.length < 8) {
-                    self.showFieldError($('#password'), 'Password must be at least 8 characters.');
-                    isValid = false;
+                // PASSWORD REQUIREMENTS: Check all requirements
+                if (password) {
+                    var passwordValidation = self.validatePasswordRequirements(password);
+                    if (!passwordValidation.isValid) {
+                        self.showFieldError($('#password'), passwordValidation.message);
+                        isValid = false;
+                    }
                 }
             } else if (step === 3) {
                 // STEP 3: Interests validation
@@ -1718,10 +1746,13 @@
                     }
                 }
                 
-                // PASSWORD LENGTH VALIDATION: Minimum 8 characters
-                if (name === 'password' && value.length < 8) {
-                    this.showFieldError($field, 'Password must be at least 8 characters.');
-                    return false;
+                // PASSWORD VALIDATION: Check all requirements
+                if (name === 'password' || name === 'profile_password') {
+                    var passwordValidation = this.validatePasswordRequirements(value);
+                    if (!passwordValidation.isValid) {
+                        this.showFieldError($field, passwordValidation.message);
+                        return false;
+                    }
                 }
                 
                 // DATE OF BIRTH VALIDATION: Future date, minimum age, maximum age
@@ -1931,27 +1962,114 @@
         },
         
         /**
-         * Check password strength
+         * Validate password requirements
+         * 
+         * Checks if password meets all requirements:
+         * - At least 8 characters
+         * - At least one uppercase letter
+         * - At least one lowercase letter
+         * - At least one number
+         * - At least one special character
+         * 
+         * @method validatePasswordRequirements
+         * @param {string} password - Password to validate
+         * @returns {object} Object with isValid (boolean) and message (string) properties
+         */
+        validatePasswordRequirements: function(password) {
+            if (!password) {
+                return { isValid: false, message: 'Password is required.' };
+            }
+            
+            var errors = [];
+            
+            // Check minimum length
+            if (password.length < 8) {
+                errors.push('at least 8 characters');
+            }
+            
+            // Check for uppercase letter
+            if (!password.match(/[A-Z]/)) {
+                errors.push('one capital letter');
+            }
+            
+            // Check for lowercase letter
+            if (!password.match(/[a-z]/)) {
+                errors.push('one lowercase letter');
+            }
+            
+            // Check for number
+            if (!password.match(/\d/)) {
+                errors.push('one number');
+            }
+            
+            // Check for special character
+            if (!password.match(/[^a-zA-Z\d]/)) {
+                errors.push('one special character');
+            }
+            
+            if (errors.length > 0) {
+                var message = 'Password must contain ' + errors.join(', ') + '.';
+                return { isValid: false, message: message };
+            }
+            
+            return { isValid: true, message: '' };
+        },
+        
+        /**
+         * Check password strength and update requirements checklist
+         * 
+         * Updates visual indicators for each password requirement as user types.
+         * Also updates the overall strength meter.
          */
         checkPasswordStrength: function(password) {
-            var $meter = $('.doregister-password-strength');
+            var $field = $('#password');
+            if ($field.length === 0) {
+                $field = $('#profile_password');
+            }
+            
+            var $meter = $field.closest('.doregister-field-group').find('.doregister-password-strength');
+            var $requirements = $field.closest('.doregister-field-group').find('.doregister-password-requirements');
+            
+            // Check individual requirements
+            var hasLength = password.length >= 8;
+            var hasUppercase = password.match(/[A-Z]/) !== null;
+            var hasLowercase = password.match(/[a-z]/) !== null;
+            var hasNumber = password.match(/\d/) !== null;
+            var hasSpecial = password.match(/[^a-zA-Z\d]/) !== null;
+            
+            // Update requirement indicators
+            if ($requirements.length > 0) {
+                $requirements.find('[data-requirement="length"]').toggleClass('doregister-requirement-met', hasLength);
+                $requirements.find('[data-requirement="uppercase"]').toggleClass('doregister-requirement-met', hasUppercase);
+                $requirements.find('[data-requirement="lowercase"]').toggleClass('doregister-requirement-met', hasLowercase);
+                $requirements.find('[data-requirement="number"]').toggleClass('doregister-requirement-met', hasNumber);
+                $requirements.find('[data-requirement="special"]').toggleClass('doregister-requirement-met', hasSpecial);
+                
+                // Show/hide requirements list
+                if (password.length === 0) {
+                    $requirements.removeClass('doregister-visible');
+                } else {
+                    $requirements.addClass('doregister-visible');
+                }
+            }
+            
+            // Calculate overall strength
             var strength = 0;
+            if (hasLength) strength++;
+            if (hasUppercase) strength++;
+            if (hasLowercase) strength++;
+            if (hasNumber) strength++;
+            if (hasSpecial) strength++;
             
-            if (password.length >= 8) strength++;
-            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
-            if (password.match(/\d/)) strength++;
-            if (password.match(/[^a-zA-Z\d]/)) strength++;
-            
+            // Update strength meter
             $meter.removeClass('doregister-weak doregister-medium doregister-strong');
             
             if (password.length === 0) {
                 $meter.text('').removeClass('doregister-visible');
-            } else if (strength <= 2) {
-                $meter.text('Weak').addClass('doregister-weak doregister-visible');
-            } else if (strength === 3) {
-                $meter.text('Medium').addClass('doregister-medium doregister-visible');
+            } else if (strength < 5) {
+                $meter.text('Password requirements not met').addClass('doregister-weak doregister-visible');
             } else {
-                $meter.text('Strong').addClass('doregister-strong doregister-visible');
+                $meter.text('Strong password').addClass('doregister-strong doregister-visible');
             }
         },
         

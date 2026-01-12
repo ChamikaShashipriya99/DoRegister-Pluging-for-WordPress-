@@ -163,9 +163,14 @@ class DoRegister_Ajax {
             $errors['email'] = 'Email already exists.';
         }
         
-        // Validate password: required and minimum 8 characters
-        if (empty($password) || strlen($password) < 8) {
-            $errors['password'] = 'Password must be at least 8 characters.';
+        // Validate password: required and must meet all requirements
+        if (empty($password)) {
+            $errors['password'] = 'Password is required.';
+        } else {
+            $password_validation = $this->validate_password_requirements($password);
+            if (!$password_validation['is_valid']) {
+                $errors['password'] = $password_validation['message'];
+            }
         }
         
         // Validate password confirmation: must match password
@@ -750,9 +755,10 @@ class DoRegister_Ajax {
         
         // Validate password: only if password is being changed
         if (!empty($password)) {
-            // Password is being changed - validate it
-            if (strlen($password) < 8) {
-                $errors['password'] = 'Password must be at least 8 characters.';
+            // Password is being changed - validate all requirements
+            $password_validation = $this->validate_password_requirements($password);
+            if (!$password_validation['is_valid']) {
+                $errors['password'] = $password_validation['message'];
             }
             
             // Validate password confirmation: must match password
@@ -913,6 +919,60 @@ class DoRegister_Ajax {
         }
         
         // All validations passed
+        return array('is_valid' => true, 'message' => '');
+    }
+    
+    /**
+     * Validate password requirements
+     * 
+     * Validates that the password meets all requirements:
+     * - At least 8 characters
+     * - At least one uppercase letter
+     * - At least one lowercase letter
+     * - At least one number
+     * - At least one special character
+     * 
+     * @since 1.0.0
+     * @param string $password Password to validate
+     * @return array Array with 'is_valid' (boolean) and 'message' (string) keys
+     */
+    private function validate_password_requirements($password) {
+        if (empty($password)) {
+            return array('is_valid' => false, 'message' => 'Password is required.');
+        }
+        
+        $errors = array();
+        
+        // Check minimum length
+        if (strlen($password) < 8) {
+            $errors[] = 'at least 8 characters';
+        }
+        
+        // Check for uppercase letter
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = 'one capital letter';
+        }
+        
+        // Check for lowercase letter
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = 'one lowercase letter';
+        }
+        
+        // Check for number
+        if (!preg_match('/\d/', $password)) {
+            $errors[] = 'one number';
+        }
+        
+        // Check for special character
+        if (!preg_match('/[^a-zA-Z\d]/', $password)) {
+            $errors[] = 'one special character';
+        }
+        
+        if (!empty($errors)) {
+            $message = 'Password must contain ' . implode(', ', $errors) . '.';
+            return array('is_valid' => false, 'message' => $message);
+        }
+        
         return array('is_valid' => true, 'message' => '');
     }
 }
